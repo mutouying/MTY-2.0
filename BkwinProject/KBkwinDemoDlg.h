@@ -16,26 +16,30 @@ public:
 
     enum
     {
-        IDC_BTN_CLOSE = 1000,
+//         IDC_BTN_CLOSE = 1000,
+// 		IDC_BTN_CTRL_SET = 2000,
+// 		IDC_BTN_DEMO_LISTWND = 2001,
+// 		IDC_BTN_DEMO_MENU = 2002,
 
-		IDC_BTN_CTRL_SET = 2000,
 
-		IDC_BTN_DEMO_LISTWND = 2001,
-		IDC_BTN_DEMO_MENU = 2002,
+		IDC_BTN_MIN								=	100,
+		IDC_BTN_CLOSE							=	102,
+		IDC_BTN_SETTING							=	80002,
+
     };
 
 protected:
     BK_NOTIFY_MAP(IDC_RICHVIEW_WIN_EX)
-        BK_NOTIFY_ID_COMMAND(IDC_BTN_CLOSE, OnBtnClose)
-		BK_NOTIFY_ID_COMMAND(IDC_BTN_CTRL_SET, OnBtnCtrlSet)
-		BK_NOTIFY_ID_COMMAND(IDC_BTN_DEMO_LISTWND, OnBtnDemoListWnd)
-		BK_NOTIFY_ID_COMMAND(IDC_BTN_DEMO_MENU, OnBtnDemoMenu)
+		BK_NOTIFY_ID_COMMAND(IDC_BTN_MIN, OnBtnMin)
+		BK_NOTIFY_ID_COMMAND(IDC_BTN_CLOSE, OnBtnClose)
+		BK_NOTIFY_ID_COMMAND(IDC_BTN_SETTING,OnSetting)
     BK_NOTIFY_MAP_END()
 
     BEGIN_MSG_MAP_EX(CBkDialogViewImplEx<KBkwinDemoDlg>)
         MSG_BK_NOTIFY(IDC_RICHVIEW_WIN_EX)
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_SYSCOMMAND(OnSysCommand)
+	
 		CHAIN_MSG_MAP(CBkDialogViewImplEx<KBkwinDemoDlg>)
         REFLECT_NOTIFICATIONS_EX()
     END_MSG_MAP()
@@ -43,13 +47,14 @@ protected:
     BOOL OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/);
     void OnBtnClose();
     void OnSysCommand(UINT nID, CPoint point);
-
-	void OnBtnDemoListWnd();
-	void OnBtnDemoMenu();
-	void OnBtnCtrlSet();
+	void OnSetting();
 
 protected:
 	virtual void OnBkMenuCmd(CBkDialogMenu*  pDialogMenu, LPCWSTR lpszMenuName);
+	void OnBtnMin();
 protected:
 	CBkDialogMenu* m_pMenu;
+
+private:
+	RECT					m_oldRect;
 };

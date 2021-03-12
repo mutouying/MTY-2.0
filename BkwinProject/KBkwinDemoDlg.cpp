@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "KBkwinDemoDlg.h"
-#include "DemoListWndDlg.h"
+
 #include "DemoCmnCtrlSetDlg.h"
+#include "SettingDlg.h"
 
 KBkwinDemoDlg::KBkwinDemoDlg()
     : CBkDialogViewImplEx<KBkwinDemoDlg>(IDR_MAIN)
 {
-	BkWin::WndShadowHelper<KBkwinDemoDlg>::SetShadowData(12, IDP_SHADOW);
 	m_pMenu = NULL;
 }
 
@@ -27,11 +27,6 @@ BOOL KBkwinDemoDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
     return TRUE;
 }
 
-void KBkwinDemoDlg::OnBtnClose()
-{
-    EndDialog(IDCLOSE);
-}
-
 void KBkwinDemoDlg::OnSysCommand(UINT nID, CPoint point)
 {
     if (nID == SC_CLOSE)
@@ -47,35 +42,56 @@ void KBkwinDemoDlg::OnSysCommand(UINT nID, CPoint point)
     }
 }
 
-void KBkwinDemoDlg::OnBtnDemoListWnd()
-{
-	DemoListWndDlg dlg;
-	dlg.DoModal(m_hWnd);
-}
-
-void KBkwinDemoDlg::OnBtnDemoMenu()
-{
-	if (m_pMenu == NULL) {
-		m_pMenu = new CBkDialogMenu();
-		m_pMenu->SetCmdListener(this);
-		m_pMenu->CreateMenu(m_hWnd, IDR_IMAGE_CONTENT_MENULAYOUT);
-	}
-
-	CPoint pt;
-	::GetCursorPos(&pt);
-	m_pMenu->PopUp(pt);
-}
-
-void KBkwinDemoDlg::OnBtnCtrlSet()
-{
-	DemoCmnCtrlSetDlg dlg;
-	dlg.DoModal(m_hWnd);
-}
-
 void KBkwinDemoDlg::OnBkMenuCmd(CBkDialogMenu* pDialogMenu, LPCWSTR lpszMenuName)
 {	
 	CString strCmd;
 
 	strCmd.Format(L"OnBkMenuCmd name=%s", lpszMenuName);
 	MessageBox(strCmd);
+}
+
+void KBkwinDemoDlg::OnBtnMin()
+{
+	SendMessage(WM_SYSCOMMAND, SC_MINIMIZE | HTCAPTION, 0);
+	GetWindowRect(&m_oldRect);
+}
+
+
+void KBkwinDemoDlg::OnBtnClose()
+{
+	// TODO  save to ×¢²á±í
+
+	ShowWindow(SW_HIDE);
+	EndDialog(IDCANCEL);
+}
+
+void KBkwinDemoDlg::OnSetting()
+{
+	SettingDlg m_settingDlg;
+	m_settingDlg.DoModal();
+// 	KChildDlg m_settingDlg;            
+// 	if(m_settingDlg.DoModal(GetViewHWND(),NULL)==IDOK)
+// 	{
+// 		CGlobalSetting::m_GlobalFlag.uColumnChoosed=m_settingDlg.uFunRet;
+// 	}
+// 	else
+// 	{
+// 		return;
+// 	}
+// 	m_wndListProcessInfo.m_list.DeleteAllItems(); // row	
+// 
+// 	m_wndListProcessInfo.m_list.DeleteColumns();  // header
+// 
+// 
+// 	// modlue info
+// 	_DeleteAllModuleInfo();
+// 	// init header
+// 	_InitListCtrlHeader();
+// 	_RefreshListCtrl(m_mapCopy, TRUE);
+// 	m_wndListProcessInfo.SetScrollPos(SB_HORZ, 0);
+// 	m_wndListProcessInfo.ResetScrollBars(SB_HORZ, 0, FALSE);
+// 	m_wndListProcessInfo.m_list.SetItemHighligth(0, -1, 0, 0);
+// 	m_wndListProcessInfo.m_list.ResetScrollBars();
+// 	m_wndListProcessInfo.m_list.Invalidate();
+
 }

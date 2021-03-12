@@ -1,21 +1,34 @@
-﻿<layer title="BkWin" width="800" height="600" appwin="1" resize="0">
-	<header crbg="f3f3f3"  width="full" height="36">
-		<text class="dlgtitle" pos="25,10">BkWin Damo Entry</text>
-		<imgbtn id="1000" class="linkimage" skin="closebtn" pos="-37,0"/>
-	</header>
+﻿<layer title="BkwinProject" width="800" height="570" appwin="1" resize="0" maximize="1" >
+  <header crbg="5a9deb" width="full" height="30">
+    <imgbtn id="100" pos="-72,0" skin="dlg_btn_min"/>
+    <!--<imgbtn id="101" pos="-72,0,31,17" skin="dlg_btn_fullwnd"/>-->
+    <imgbtn id="102" pos="-40,0"  skin="dlg_btn_close"/>
+    
+    <img pos="6,8" skin="logo"/>
+    <text id="400" class="text_title" pos="25,10">进程管理器</text>
+    <imgbtn id="80002" pos="-151,4"  class="linkimage"  skin="menu_setting"/>
+    <text id="80002"  pos="-132,6"  crtext="FFFFFF">设置</text>
+  </header>
 
-	<body crbg="ffffff" width="full" height="full">
-      <dlgbtn pos="20,20,120,54" class="btn_cmn" id="2000">
-          <text class="text_center" pos="0,0,-0,-0">普通控件集合</text>
-      </dlgbtn>
-      <dlgbtn pos="140,20,240,54" class="btn_cmn"  id="2001">
-        <text class="text_center" pos="0,0,-0,-0">ListWnd Demo</text>
-      </dlgbtn>
-      <dlgbtn pos="260,20,360,54" class="btn_cmn"  id="2002">
-        <text class="text_center" pos="0,0,-0,-0">菜单 Demo</text>
-      </dlgbtn>
-	</body>
-
-	<footer crbg="f3f3f3" width="full" height="45">
-	</footer>
+  <body crbg="ffffff" width="full" height="full" >
+  
+    <dlg id="139" pos="0,0,-0,65"  crbg="f3f3f3">
+      <img pos="25,9" skin="logo_big" />
+      <!--<text pos="93,17,183" font="0004" crtext="5a9deb">正在运行进程:</text>^
+      <text id="800" pos="184,17" font="0004" crtext="5a9deb"></text>-->
+     
+      <text pos="108,41">CPU占用:</text>
+      <text id="801" pos="160,41"></text>
+     
+      <text pos="227,41">内存占用:</text>
+      <text id="802" pos="280,41"></text>
+      
+      <imgbtn id="80001"  pos="-129,22"  skin="dlg_btn_over" class="linkimage"  ></imgbtn>
+      
+    </dlg>
+    
+    <!-- 进程信息-->
+    <!--<listwnd id="448" pos="0,64,-0,-25" />-->
+    
+  </body>
 </layer>

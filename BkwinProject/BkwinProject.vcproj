@@ -170,27 +170,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\DemoCmnCtrlSetDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DemoCmnCtrlSetDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DemoListWndDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DemoListWndDlg.h"
-				>
-			</File>
-			<File
 				RelativePath=".\KBkwinDemoDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\KBkwinDemoDlg.h"
 				>
 			</File>
 			<File
@@ -198,7 +178,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ReportPageUIHandler.h"
+				RelativePath=".\SettingDlg.cpp"
 				>
 			</File>
 			<File
@@ -212,14 +192,6 @@
 						UsePrecompiledHeader="1"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TaskMgrDemo.h"
-				>
 			</File>
 		</Filter>
 		<Filter
@@ -695,14 +667,34 @@
 					>
 				</File>
 				<File
-					RelativePath=".\res\xml\dlg_demo_listwnd.xml"
-					>
-				</File>
-				<File
 					RelativePath=".\res\xml\dlg_main.xml"
 					>
 				</File>
+				<File
+					RelativePath=".\res\xml\dlg_setting.xml"
+					>
+				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="Header"
+			>
+			<File
+				RelativePath=".\kbkwindemodlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SettingDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TaskMgrDemo.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
