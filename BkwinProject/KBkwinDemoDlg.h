@@ -4,7 +4,10 @@
 #include "bkwin/CBkDialogViewImplEx.h"
 #include "bkwin/bkshadowdrawable.h"
 #include "bkwin/CBkDialogMenu.h"
+#include "ProcessMgr/ProcessDefineEx.h"
 
+
+using namespace std;
 class KBkwinDemoDlg
     : public CBkDialogViewImplEx<KBkwinDemoDlg>
 	, public BkWin::WndShadowHelper<KBkwinDemoDlg>
@@ -19,6 +22,8 @@ public:
 		IDC_BTN_MIN								=	100,
 		IDC_BTN_CLOSE							=	102,
 		IDC_BTN_SETTING							=	103,
+
+		IDC_LIST_PROC							= 1000,
     };
 
 protected:
@@ -42,12 +47,15 @@ protected:
     void OnSysCommand(UINT nID, CPoint point);
 	void OnSetting();
 
+	void testCode();
 protected:
 	virtual void OnBkMenuCmd(CBkDialogMenu*  pDialogMenu, LPCWSTR lpszMenuName);
 	void OnBtnMin();
 protected:
 	CBkDialogMenu* m_pMenu;
 
+	map<DWORD, SetProcessInfo> m_mapProInfo;
+	map<DWORD, SetProcessInfo> m_mapProCache;
 private:
 	RECT					m_oldRect;
 };
