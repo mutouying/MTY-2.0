@@ -63,9 +63,10 @@ protected:
 private:
 	void ShowDoModalMsgBox(BkSharePtr<CString> msg);
 	void InitSeting();
-	void    SaveSetting();
+	void SaveSetting();
 
-	int   uFunRet; // 保存的标志位, 顺序读写
+	unsigned int   m_flagSet; // 只有二进制的10 位即可 （最大1024）
+	int   m_SelectSum;
 };
 
 #endif //__RB_UI_DemoListWndDlg_h_

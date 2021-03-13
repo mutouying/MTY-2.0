@@ -1,7 +1,11 @@
 #include "stdafx.h"
 #include "KBkwinDemoDlg.h"
-
 #include "SettingDlg.h"
+
+#include "framework/KTinyXml.h"
+#include "framework/KCreateXmlElementFunc.h"
+
+#define  ITEM_HEIGHT 20
 
 KBkwinDemoDlg::KBkwinDemoDlg()
     : CBkDialogViewImplEx<KBkwinDemoDlg>(IDR_MAIN)
@@ -24,6 +28,7 @@ KBkwinDemoDlg::~KBkwinDemoDlg()
 BOOL KBkwinDemoDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
 	testCode();
+	UpdateWindowsUI();
     return TRUE;
 }
 
@@ -89,4 +94,146 @@ void KBkwinDemoDlg::testCode()
 
 }
 
+void KBkwinDemoDlg::UpdateCacheMapToRealMap()
+{
+	m_mapProInfo.clear();
+	m_mapProInfo.insert(m_mapProCache.begin(), m_mapProCache.end());
 
+}
+
+void KBkwinDemoDlg::OnListItemLButtonUp( int nListItem )
+{
+
+// 	CString strKey;
+// 	strKey = GetListItemChildCtrlText(IDC_WND_HOT, nListItem, IDC_WND_HOTKEY);
+// 	
+
+}
+
+void KBkwinDemoDlg::OnListItemMouseHover( int nListItem )
+{
+
+	// SetListItemChildCtrlAttribute(IDC_LIST_PROC, nListItem, IDC_LIST_KEY, "crtext", "333333");
+}
+
+void KBkwinDemoDlg::OnListItemMouseLeave( int nListItem )
+{
+
+	// SetListItemChildCtrlAttribute(IDC_LIST_PROC, nListItem, IDC_LIST_KEY, "crtext", "999999");
+}
+
+void KBkwinDemoDlg::UpdateWindowsUI()
+{
+	if(m_mapProInfo.empty())
+	{
+		return;
+	}
+	DeleteAllListItem(IDC_LIST_PROC);
+
+
+	// TODO 第一列的行头在 这里添加
+	AddOnekeyToListWnd( SetProcessInfo() , 0);
+
+	int nIndex = 1;
+	for (map<DWORD, SetProcessInfo>::iterator it= m_mapProInfo.begin();
+		it != m_mapProInfo.end(); ++it)
+	{
+		SetProcessInfo info = it->second;
+		AddOnekeyToListWnd(info, nIndex++);
+	}
+	UpdateLayoutList(IDC_LIST_PROC);
+
+	SendMessage(WM_PAINT);
+}
+
+BOOL KBkwinDemoDlg::AddOnekeyToListWnd( SetProcessInfo & data , int nIndex)
+{
+	BOOL bReturn = FALSE;
+	KTinyXml tinyXml;
+
+	do 
+	{
+		BOOL bRetCode = FALSE;
+
+		if (NULL == tinyXml.Open("Root", TRUE))
+		{
+			break;
+		}
+
+		if (TRUE)
+		{
+			KTinyXmlRememberPos(tinyXml);
+			bRetCode = CreateHotkeyListItemXml(data, tinyXml, nIndex);
+		}
+
+		if (!bRetCode || !tinyXml.FirstChild())
+		{
+			goto Exit0;
+		}
+		CStringA strXml = tinyXml.ToXml();
+		int nListItem = AppendListItem(IDC_LIST_PROC, tinyXml.GetElement(), -1, FALSE);
+		if (nListItem == -1) goto Exit0;
+
+		bReturn = TRUE;
+
+	}while(FALSE);
+
+Exit0:
+	return bReturn;
+}
+
+BOOL KBkwinDemoDlg::CreateHotkeyListItemXml(SetProcessInfo & data, KTinyXml tinyXml, int nIndex )
+{
+	int nwidth = 100; //可变, 根据选了多少个长度
+	CString pos;
+	int posFirstLeft;
+	int posFirstRight;
+	CString str;
+
+	BOOL bReturn = FALSE;
+	CStringA StrPos;
+	KCreateXmlElementFunc XmlElFunc(tinyXml);
+
+	bReturn = XmlElFunc.AddTinyChild("listitem", 0, NULL, NULL, NULL, NULL, "1");
+	if (FALSE == bReturn) goto Exit0;
+
+
+	bReturn = XmlElFunc().Write("height", ITEM_HEIGHT);
+	if (FALSE == bReturn) goto Exit0;
+
+	bReturn = XmlElFunc().Write("class", "listitem_class");
+	if (FALSE == bReturn) goto Exit0;
+
+	bReturn = XmlElFunc.AddTinyChild("dlg", NULL,  "0,0,-0,-0", NULL, NULL, NULL, "1");
+	if (FALSE == bReturn) goto Exit0;
+ 
+	posFirstLeft = 0;
+	posFirstRight = posFirstLeft + nwidth;
+	pos.AppendFormat(L"%d,0,%d,-0", posFirstLeft, posFirstRight);
+	bReturn = XmlElFunc.AddTinySibling("text", IDC_LIST_KEY, CT2A(pos), NULL, NULL, "text_center");
+	if (FALSE == bReturn) return bReturn;
+	XmlElFunc().Write("crtext", "999999");
+	XmlElFunc().WriteText(data.strProcessName);
+
+	pos.Empty();
+	posFirstLeft = posFirstRight;
+	posFirstRight = posFirstLeft + nwidth;
+	pos.AppendFormat(L"%d,0,%d,-0", posFirstLeft, posFirstRight);
+	bReturn = XmlElFunc.AddTinySibling("text", IDC_LIST_KEY, CT2A(pos), NULL, NULL, "text_center");
+	if (FALSE == bReturn) return bReturn;
+	XmlElFunc().Write("crtext", "999999");
+	str.Empty();
+	str.AppendFormat(L"%d", data.dwParentPID);
+	XmlElFunc().WriteText(str);
+
+Exit0:
+	return bReturn;
+}
+
+void KBkwinDemoDlg::OnListItemChildLBtnUp(int nListItem, int nChildCtrlId)
+{
+// 	BkSharePtr<CString> strMsg = BkSharePtr<CString>::createObject();
+// 
+// 	strMsg.DataRef().Format(L"DemoListWndDlg::OnListItemChildLBtnUp:%d %d", nListItem, nChildCtrlId);
+// 	PostRunnable(BkWin::FuncFactory::create_class_func(this, &DemoListWndDlg::ShowDoModalMsgBox, strMsg));
+}

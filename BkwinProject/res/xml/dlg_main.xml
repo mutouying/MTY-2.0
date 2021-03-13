@@ -1,4 +1,4 @@
-﻿<layer title="BkwinProject" width="800" height="570" appwin="1" resize="0" maximize="1" >
+﻿<layer title="BkwinProject" width="1000" height="570" appwin="1" resize="0" maximize="1" >
   <header crbg="5a9deb" width="full" height="30">
     <img pos="6,8" skin="logo"/>
     <imgbtn id="100" pos="-72,0" skin="dlg_btn_min"/>
@@ -23,9 +23,27 @@
       <imgbtn id="203"  pos="-129,22"  skin="dlg_btn_over" class="linkimage"  ></imgbtn>
       
     </dlg>
+
+
+    <dlg id="300" pos="0,65,-0,85"  class="listitem_class">
+      <text pos="0,0,100,-0"   show="1"  class="text_center">进程名</text>
+      <text pos="100,0,200,-0"  show="1" class="text_center">进程ID</text>
+      <text pos="400,0,500,-0" show="1" class="text_center">进程全路径</text>
+      <text pos="200,0,300,-0" show="1" class="text_center">CPU占用</text>
+      <text pos="300,0,400,-0"  show="1" class="text_center">内存占用</text>
+      
+      <text pos="500,0,590,-0" class="text_center">用户名</text>
+      <text pos="600,0,690,-0" class="text_center">父进程PID</text>
+      <text pos="700,0,790,-0" class="text_center">句柄数</text>
+      <text pos="800,0,890,-0" class="text_center">线程数</text>
+      <text pos="900,0,990,-0" class="text_center">会话ID</text> 
+    </dlg>
     
-    <!-- 进程信息-->
-    <listwnd id="1000" pos="0,64,-0,-25" />
+    
+
+    <!-- 进程信息listwnd -->
+    <listwnd id="1000" pos="0,85,-0,-25" />
+
     
   </body>
 </layer>
