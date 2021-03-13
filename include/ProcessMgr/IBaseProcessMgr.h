@@ -12,7 +12,5 @@ public:
     virtual HRESULT __stdcall UnInit()	= 0;
     virtual HRESULT __stdcall Drop() = 0;
 
-public:
-
 
 };

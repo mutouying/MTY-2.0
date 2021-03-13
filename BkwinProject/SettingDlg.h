@@ -1,11 +1,3 @@
-/*************************************************
-//  Copyright (C), 2017-2027, CS&S. Co., Ltd.
-//  File name:       DemoListWndDlg.h  
-//  Version:          1.0     
-//  Date:              2021/01/10
-//    <author>      hexujun
-//  mail:           504309952@qq.com 
-*************************************************/
 #ifndef __RB_UI_DemoListWndDlg_h_
 #define __RB_UI_DemoListWndDlg_h_
 
@@ -22,19 +14,34 @@ class SettingDlg
 public:
 	SettingDlg();
 
-	enum
-	{
-		IDC_BTN_CLOSE = 1000,
-		IDC_LISTWND = 2000
+	enum tagCHECKID{
+		ID_CHECK_PRO_NAME		= 101,
+		ID_CHECK_PRO_ID			,
+		ID_CHECK_PRO_PATH		,
+		ID_CHECK_PRO_CPU		,
+		ID_CHECK_PRO_MEM		,
+
+		ID_CHECK_PRO_EXT_1		= 106,
+		ID_CHECK_PRO_EXT_2		,
+		ID_CHECK_PRO_EXT_3		,
+		ID_CHECK_PRO_EXT_4		,
+		ID_CHECK_PRO_EXT_5		,
 	};
+
+	enum	tagBTN
+	{
+		IDC_BTN_CLOSE		=200,
+		IDC_BTN_SURE		=201,
+		IDC_BTN_CANCLE		=202,
+		IDC_BTN_RECOVER		=203,
+	};
+
 
 protected:
 	BK_NOTIFY_MAP(IDC_RICHVIEW_WIN_EX)
 		BK_NOTIFY_ID_COMMAND(IDC_BTN_CLOSE, OnBtnClose)
-		BK_LISTWND_NOTIFY_BEGIN(IDC_LISTWND)
-			BK_LISTWND_LISTITEM_LBUTTONUP(OnListItemLBtnUp)
-			BK_LISTWND_LISTITEM_CHILD_LBUTTONUP(OnListItemChildLBtnUp)
-		BK_LISTWND_NOTIFY_END()
+		BK_NOTIFY_ID_COMMAND(IDC_BTN_SURE, OnBtnConfirm)
+		BK_NOTIFY_ID_COMMAND(IDC_BTN_CANCLE, OnBtnCancle)
 	BK_NOTIFY_MAP_END()
 
 	BEGIN_MSG_MAP_EX(SettingDlg)
@@ -48,13 +55,18 @@ protected:
 
 	BOOL OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/);
 	void OnBtnClose();
+	void OnBtnConfirm();
+	void OnBtnCancle();
 	void OnSysCommand(UINT nID, CPoint point);
 
-	void OnListItemLBtnUp(int nListItem);
-	void OnListItemChildLBtnUp(int nListItem, int nChildCtrlId);
 
-protected:
+private:
 	void ShowDoModalMsgBox(BkSharePtr<CString> msg);
+	void InitSeting();
+	void SaveSetting();
+
+	unsigned int   m_flagSet; // 只有二进制的10 位即可 （最大1024）
+	int   m_SelectSum;
 };
 
 #endif //__RB_UI_DemoListWndDlg_h_

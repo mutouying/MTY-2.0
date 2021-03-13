@@ -1,0 +1,35 @@
+﻿<layer title="进程管理器" width="400" height="200" show="1">
+    <header crbg="5a9deb" width="full" height="50">
+      <img pos="6,8" skin="logo"/>
+      <text class="text_title" pos="25,10">进程管理器设置</text>
+	  <imgbtn id="200" pos="-40,0" skin="dlg_btn_close"/>
+	</header>
+	
+	<body crbg="fbfbfb" width="full" height="full" >
+  
+    <check id="101" pos="20,10">进程名</check>
+    <check id="102" pos="20,30">进程ID</check>
+    <check id="103" pos="20,50">进程全路径</check>
+    <check id="104" pos="20,70">CPU占用</check>
+    <check id="105" pos="20,90">内存占用</check>
+
+    <check id="106" pos="|5,10">用户名</check>
+    <check id="107" pos="|5,30">父进程PID</check>
+    <check id="108" pos="|5,50">句柄数</check>
+    <check id="109" pos="|5,70">线程数</check>
+    <check id="110" pos="|5,90">会话ID</check>
+
+    <dlg pos="0,-30,-0,-0"  >
+      <!--<text  id="40007" pos="15,10" crtext="649AF0" class="linkimage"  font="0002">恢复默认</text>-->
+      <dlgbtn id="201" crbg="5a9deb" pos="-120,3,-70,28" class="linkimage" >
+        <text pos="12,0,-12,-0"  class="linkimage">确定</text>
+      </dlgbtn>
+
+      <dlgbtn id="202"  crbg="5a9deb" pos="-65,3,-15,28" class="linkimage" >
+        <text pos="12,0,-12,-0" class="linkimage">取消</text>
+      </dlgbtn>
+
+    </dlg>
+    
+	</body>
+</layer>

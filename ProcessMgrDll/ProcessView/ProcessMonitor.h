@@ -35,10 +35,11 @@ private:
     virtual void   OnActivate(KActor* pActor);
 
 private:
+    BOOL EnableDebugPrivilege();
     void NotifyLoadData();
     void NotifyLoadEnd();
-    void NotifyDataChange(emProcessChangeType emType, ProcessInfo* pProcInfo);
-    void IpcAddProcParam(KEasyIpcClientWrap& client, ProcessInfo* pProcInfo);
+    void NotifyDataChange(emProcessChangeType emType, ProcessInfo* pProcInfo, DWORD dwProcessID);
+    void IpcAddProcParam(KEasyIpcClientWrap& client, ProcessInfo* pProcInfo, DWORD dwProcessID);
 
 private:
     BOOL m_bInit;
@@ -53,6 +54,4 @@ private:
     std::set<DWORD>    m_setProcId;
 
     KActor m_atorProcMonitor;
-    std::map<HANDLE, ProcessInfo*> m_mapProcess;
-
 };

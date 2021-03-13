@@ -16,7 +16,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="..\bin"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="1"
@@ -89,7 +89,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="..\bin"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="1"
@@ -112,8 +112,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/wd4430"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;..\..\bkwin;..\..\bkwin\wtl"
+				AdditionalIncludeDirectories="&quot;..\Microsoft SDKs\Windows\v6.1\Include&quot;;..\include;..\;..\publish;..\publish\wtl;.\"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
@@ -170,6 +171,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\ConfigUtil.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\KBkwinDemoDlg.cpp"
 				>
 			</File>
@@ -197,6 +202,22 @@
 		<Filter
 			Name="import"
 			>
+			<File
+				RelativePath="..\include\framework\KCreateXmlElementFunc.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\framework\KCreateXmlElementFunc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\framework\KTinyXml.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\framework\KTinyXml.h"
+				>
+			</File>
 			<Filter
 				Name="framework"
 				>
@@ -680,7 +701,15 @@
 			Name="Header"
 			>
 			<File
+				RelativePath=".\ConfigUtil.h"
+				>
+			</File>
+			<File
 				RelativePath=".\kbkwindemodlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KRegister2.h"
 				>
 			</File>
 			<File

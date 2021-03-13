@@ -16,6 +16,8 @@ void ProcessMonitor::Init()
 {
     m_evtExit.Create(NULL, TRUE, FALSE);
 
+    EnableDebugPrivilege();
+
     if(m_bFirstIn)
     {
         GetAllProcessInfo();
@@ -27,7 +29,26 @@ void ProcessMonitor::Init()
 
 void ProcessMonitor::UnInit()
 {
+    if(m_evtExit.GetHandle())
+    {
+        m_evtExit.SetEvent();
+        m_evtExit.Close();
+    }
 
+    ProcessInfo* pItem = NULL;
+    std::map<DWORD, ProcessInfo*>::iterator   iter = m_mapProcessInfo.begin();
+    for(iter; iter != m_mapProcessInfo.end(); ++iter)
+    {
+        pItem  = (*iter).second;
+        if(pItem)
+        {
+            pItem->UnInit();
+            delete pItem;
+            pItem = NULL;
+        }
+    }
+
+    m_atorProcMonitor.Stop();
 }
 
 void ProcessMonitor::GetAllProcessInfo()
@@ -74,6 +95,9 @@ BOOL ProcessMonitor::BeginEnumProcess()
     m_dwProcessNum = dwProcessNum / sizeof(DWORD);
     for(DWORD i = 0; i < m_dwProcessNum; ++i)
     {
+        if(dwProcesses[i] == 0  || dwProcesses[i] == 4)
+            continue;
+
         hProcess = ::OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, dwProcesses[i]);
         if(hProcess = NULL)
             continue;
@@ -107,16 +131,20 @@ void ProcessMonitor::FirstLoadProcess()
     m_dwProcessNum = dwProcessNum / sizeof(DWORD);
     for(DWORD i = 0; i < m_dwProcessNum; ++i)
     {
-        hProcess = ::OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, dwProcesses[i]);
-        if(hProcess = NULL)
+        if(dwProcesses[i] == 0  || dwProcesses[i] == 4)
             continue;
+
+        hProcess = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcesses[i]);
+        if(hProcess == NULL)
+        {
+            LRESULT lRes = GetLastError();
+            continue;
+        }
 
         pInfo = new ProcessInfo;
         pInfo->Init(hProcess, dwProcesses[i]);
         pInfo->GetProcessInfo();
 
-        //m_setProcInfo.insert(pInfo);
-        //m_setProcId.insert(dwProcesses[i]);
         m_mapProcessInfo[dwProcesses[i]] = pInfo;
     }
 
@@ -136,7 +164,7 @@ BOOL ProcessMonitor::CheckNewProcess(HANDLE hProcess, DWORD dwProcessID)
 
         m_mapProcessInfo[dwProcessID] = pInfo;
 
-        NotifyDataChange(type_process_new, pInfo);
+        NotifyDataChange(type_process_new, pInfo, dwProcessID);
         bNewProcess = TRUE;
     }
 
@@ -156,7 +184,7 @@ void ProcessMonitor::CheckProcessChange(DWORD dwProcessID)
     item->GetProcessInfo();
     if(item->IsDataChange())
     {
-        NotifyDataChange(type_process_change, item);
+        NotifyDataChange(type_process_change, item, dwProcessID);
     }
 }
 
@@ -167,7 +195,7 @@ void ProcessMonitor::CheckProcessExit()
     {
         if(m_setProcId.find((*iter).first) == m_setProcId.end())
         {
-            NotifyDataChange(type_process_exit, (*iter).second);
+            NotifyDataChange(type_process_exit, (*iter).second, (*iter).first);
         }
     }
 }
@@ -180,6 +208,51 @@ void ProcessMonitor::OnActivate(KActor* pActor)
     }
 }
 
+BOOL ProcessMonitor::EnableDebugPrivilege()
+{
+    /*HANDLE hToken;
+    BOOL fOk=FALSE;
+    if(OpenProcessToken(GetCurrentProcess(),TOKEN_ADJUST_PRIVILEGES,&hToken))
+    {
+        TOKEN_PRIVILEGES tp;
+        tp.PrivilegeCount=1;
+        LookupPrivilegeValue(NULL,SE_DEBUG_NAME,&tp.Privileges[0].Luid);
+
+        tp.Privileges[0].Attributes=SE_PRIVILEGE_ENABLED;
+        AdjustTokenPrivileges(hToken,FALSE,&tp,sizeof(tp),NULL,NULL);
+
+        fOk=(GetLastError()==ERROR_SUCCESS);
+        CloseHandle(hToken);
+    }
+    return fOk;*/
+    HANDLE hToken;
+    TOKEN_PRIVILEGES tp;
+    TOKEN_PRIVILEGES oldtp;
+    DWORD dwSize=sizeof(TOKEN_PRIVILEGES);
+    LUID luid;
+
+    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
+        if (GetLastError()==ERROR_CALL_NOT_IMPLEMENTED) return true;
+        else return false;
+    }
+    if (!LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &luid)) {
+        CloseHandle(hToken);
+        return false;
+    }
+    ZeroMemory(&tp, sizeof(tp));
+    tp.PrivilegeCount=1;
+    tp.Privileges[0].Luid=luid;
+    tp.Privileges[0].Attributes=SE_PRIVILEGE_ENABLED;
+    /* Adjust Token Privileges */
+    if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), &oldtp, &dwSize)) {
+        CloseHandle(hToken);
+        return false;
+    }
+    // close handles
+    CloseHandle(hToken);
+    return true;
+}
+
 void ProcessMonitor::NotifyLoadData()
 {
     KEasyIpcClientWrap client(ipc_first_load_process);
@@ -187,7 +260,7 @@ void ProcessMonitor::NotifyLoadData()
     std::map<DWORD, ProcessInfo*>::const_iterator   iter = m_mapProcessInfo.begin();
     for(iter; iter != m_mapProcessInfo.end(); ++iter)
     {
-        IpcAddProcParam(client, (*iter).second);
+        IpcAddProcParam(client, (*iter).second, (*iter).first);
         client.Call(L"FirstLoadProcess");
     }
 }
@@ -198,18 +271,20 @@ void ProcessMonitor::NotifyLoadEnd()
     client.Call(L"FirstLoadEnd");
 }
 
-void ProcessMonitor::NotifyDataChange(emProcessChangeType emType, ProcessInfo* pProcInfo)
+void ProcessMonitor::NotifyDataChange(emProcessChangeType emType, ProcessInfo* pProcInfo, DWORD dwProcessID)
 {
     KEasyIpcClientWrap client(ipc_refresh_process);
 
     client.AddParam(L"ProcessChangeType", emType);
-    IpcAddProcParam(client, pProcInfo);
+    IpcAddProcParam(client, pProcInfo, dwProcessID);
 
     client.Call(L"RefreshProcess");
 }
 
-void ProcessMonitor::IpcAddProcParam(KEasyIpcClientWrap& client, ProcessInfo* pProcInfo)
+void ProcessMonitor::IpcAddProcParam(KEasyIpcClientWrap& client, ProcessInfo* pProcInfo, DWORD dwProcessID)
 {
+    client.AddParam(L"dwProcessID", dwProcessID);
+
     client.AddParam(L"strProcessName", pProcInfo->m_pPrcoInfo->strProcessName);
     client.AddParam(L"strProcessFullPath", pProcInfo->m_pPrcoInfo->strProcessFullPath);
     client.AddParam(L"dwProcessID", pProcInfo->m_pPrcoInfo->dwProcessID);

@@ -21,6 +21,7 @@
   
   <class name="linkimage" cursor="hand"/>
   <class name="text_title" font="0004" crtext="0000FF"/>
-  
+  <class name="listitem_class" crbghover="cdcdcd"/>
+  <class name="text_center" textmode="25" textmodeex="25"  crtext="000000" />
   
 </style>

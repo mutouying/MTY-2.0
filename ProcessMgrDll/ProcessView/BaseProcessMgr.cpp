@@ -20,12 +20,17 @@ HRESULT __stdcall KBaseProcessMgr::Init()
 
 HRESULT __stdcall KBaseProcessMgr::UnInit()
 {
-      return S_OK;
+    m_pProcMonitor->UnInit();
+    delete m_pProcMonitor;
+    m_pProcMonitor = NULL;
+
+    return S_OK;
 }
 
 HRESULT __stdcall KBaseProcessMgr::Drop()
 {
-       return S_OK;
+    delete this;
+    return S_OK;
 }
 
 HRESULT __stdcall KBaseProcessMgr::QueryInterface(IN REFIID riid, OUT void **ppvObject)

@@ -1,34 +1,49 @@
-﻿<layer title="BkwinProject" width="800" height="570" appwin="1" resize="0" maximize="1" >
+﻿<layer title="BkwinProject" width="1000" height="570" appwin="1" resize="0" maximize="1" >
   <header crbg="5a9deb" width="full" height="30">
+    <img pos="6,8" skin="logo"/>
     <imgbtn id="100" pos="-72,0" skin="dlg_btn_min"/>
     <!--<imgbtn id="101" pos="-72,0,31,17" skin="dlg_btn_fullwnd"/>-->
     <imgbtn id="102" pos="-40,0"  skin="dlg_btn_close"/>
-    
-    <img pos="6,8" skin="logo"/>
-    <text id="400" class="text_title" pos="25,10">进程管理器</text>
-    <imgbtn id="80002" pos="-151,4"  class="linkimage"  skin="menu_setting"/>
-    <text id="80002"  pos="-132,6"  crtext="FFFFFF">设置</text>
+    <text  class="text_title" pos="25,10">进程管理器</text>
+    <imgbtn id="103" pos="-151,4"  class="linkimage"  skin="menu_setting"/>
+    <text id="103"  pos="-132,6"  crtext="FFFFFF">设置</text>
   </header>
 
-  <body crbg="ffffff" width="full" height="full" >
+  <body crbg="fbfbfb" width="full" height="full" >
   
-    <dlg id="139" pos="0,0,-0,65"  crbg="f3f3f3">
+    <dlg id="200" pos="0,0,-0,65"  crbg="f3f3f3">
       <img pos="25,9" skin="logo_big" />
       <!--<text pos="93,17,183" font="0004" crtext="5a9deb">正在运行进程:</text>^
       <text id="800" pos="184,17" font="0004" crtext="5a9deb"></text>-->
      
       <text pos="108,41">CPU占用:</text>
-      <text id="801" pos="160,41"></text>
-     
+      <text id="201" pos="160,41"></text>
       <text pos="227,41">内存占用:</text>
-      <text id="802" pos="280,41"></text>
-      
-      <imgbtn id="80001"  pos="-129,22"  skin="dlg_btn_over" class="linkimage"  ></imgbtn>
+      <text id="202" pos="280,41"></text>
+      <imgbtn id="203"  pos="-129,22"  skin="dlg_btn_over" class="linkimage"  ></imgbtn>
       
     </dlg>
+
+
+    <dlg id="300" pos="0,65,-0,85"  class="listitem_class">
+      <text pos="0,0,100,-0"   show="1"  class="text_center">进程名</text>
+      <text pos="100,0,200,-0"  show="1" class="text_center">进程ID</text>
+      <text pos="400,0,500,-0" show="1" class="text_center">进程全路径</text>
+      <text pos="200,0,300,-0" show="1" class="text_center">CPU占用</text>
+      <text pos="300,0,400,-0"  show="1" class="text_center">内存占用</text>
+      
+      <text pos="500,0,590,-0" class="text_center">用户名</text>
+      <text pos="600,0,690,-0" class="text_center">父进程PID</text>
+      <text pos="700,0,790,-0" class="text_center">句柄数</text>
+      <text pos="800,0,890,-0" class="text_center">线程数</text>
+      <text pos="900,0,990,-0" class="text_center">会话ID</text> 
+    </dlg>
     
-    <!-- 进程信息-->
-    <!--<listwnd id="448" pos="0,64,-0,-25" />-->
+    
+
+    <!-- 进程信息listwnd -->
+    <listwnd id="1000" pos="0,85,-0,-25" />
+
     
   </body>
 </layer>

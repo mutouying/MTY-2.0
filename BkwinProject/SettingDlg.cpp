@@ -1,20 +1,36 @@
 ﻿#include "stdafx.h"
 #include "SettingDlg.h"
+#include "ConfigUtil.h"
 
 SettingDlg::SettingDlg()
     : CBkDialogViewImplEx<SettingDlg>(IDR_DLG_DEMO_SETTING)
 {
+	m_flagSet = 0;
+	m_SelectSum = 0;
 	
 }
 
 BOOL SettingDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
+	InitSeting();
     return TRUE;
 }
 
 void SettingDlg::OnBtnClose()
 {
     EndDialog(IDCLOSE);
+}
+
+void SettingDlg::OnBtnCancle()
+{
+	EndDialog(IDCANCEL);
+}
+
+void SettingDlg::OnBtnConfirm()
+{
+
+	SaveSetting();
+	EndDialog(IDOK);
 }
 
 void SettingDlg::OnSysCommand(UINT nID, CPoint point)
@@ -32,25 +48,83 @@ void SettingDlg::OnSysCommand(UINT nID, CPoint point)
     }
 }
 
-void SettingDlg::OnListItemLBtnUp(int nListItem)
-{
-	BkSharePtr<CString> strMsg = BkSharePtr<CString>::createObject();
 
-	strMsg.DataRef().Format(L"DemoListWndDlg::OnListItemLBtnUp:%d", nListItem);
-	PostRunnable(BkWin::FuncFactory::create_class_func(this, &SettingDlg::ShowDoModalMsgBox, strMsg));
-}
 
 void SettingDlg::ShowDoModalMsgBox(BkSharePtr<CString> msg)
 {
 	MessageBox(msg.DataRef());
 }
 
-void SettingDlg::OnListItemChildLBtnUp(int nListItem, int nChildCtrlId)
+
+void SettingDlg::InitSeting()
 {
-	BkSharePtr<CString> strMsg = BkSharePtr<CString>::createObject();
-	
-	strMsg.DataRef().Format(L"DemoListWndDlg::OnListItemChildLBtnUp:%d %d", nListItem, nChildCtrlId);
-	PostRunnable(BkWin::FuncFactory::create_class_func(this, &SettingDlg::ShowDoModalMsgBox, strMsg));
+	// SetItemCheck(ID_CHECK_CPUCurrentUsage , (CGlobalSetting::m_GlobalFlag.uColumnChoosed & defCPUCurrentUsage)>0);
 }
 
+void SettingDlg::SaveSetting()
+{
+	m_flagSet = 0;
+	m_SelectSum = 0;
+	if ( GetItemCheck(ID_CHECK_PRO_NAME) )
+	{
+ 		m_flagSet |= FlagProcessName;
+		m_SelectSum ++;
+	}
 
+	if ( GetItemCheck(ID_CHECK_PRO_ID) )
+	{
+		m_flagSet |= FlagProcessPid;
+		m_SelectSum ++;
+	}
+
+	if ( GetItemCheck(ID_CHECK_PRO_PATH) )
+	{
+		m_flagSet |= FlagProcessPath;
+		m_SelectSum ++;
+	}
+
+	if ( GetItemCheck(ID_CHECK_PRO_CPU) )
+	{
+		m_flagSet |= FlagProcessCpu;
+		m_SelectSum ++;
+	}
+
+	if ( GetItemCheck(ID_CHECK_PRO_MEM) )
+	{
+		m_flagSet |= FlagProcessMem;
+		m_SelectSum ++;
+	}
+
+
+	if ( GetItemCheck(ID_CHECK_PRO_EXT_1) )
+	{
+		m_flagSet |= FlagProcessUser;
+		m_SelectSum ++;
+	}
+
+	if ( GetItemCheck(ID_CHECK_PRO_EXT_2) )
+	{
+		m_flagSet |= FlagProcessParent;
+		m_SelectSum ++;
+	}
+
+	if ( GetItemCheck(ID_CHECK_PRO_EXT_3) )
+	{
+		m_flagSet |= FlagProcessHandle;
+		m_SelectSum ++;
+	}
+
+	if ( GetItemCheck(ID_CHECK_PRO_EXT_4) )
+	{
+		m_flagSet |= FlagProcessThread;
+		m_SelectSum ++;
+	}
+
+	if ( GetItemCheck(ID_CHECK_PRO_EXT_5) )
+	{
+		m_flagSet |= FlagProcessSession;
+		m_SelectSum ++;
+	}
+
+	// CGlobalSetting::m_GlobalFlag.uColumnChoosed = uFunRet;
+}

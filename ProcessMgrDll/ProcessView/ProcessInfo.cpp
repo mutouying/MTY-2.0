@@ -9,6 +9,8 @@ m_hProcess(NULL)
 , m_dwProcPID(0)
 , m_bDataChange(FALSE)
 , m_bFirstInit(TRUE)
+, _last_system_time(0)
+, _last_time(0)
 , m_NtQueryInformationProcess(NULL)
 {
 }
@@ -23,6 +25,22 @@ void ProcessInfo::Init(HANDLE hProcess, DWORD dwProcessID)
     m_dwProcPID = dwProcessID;
     m_pPrcoInfo = new SetProcessInfo;
     m_bFirstInit = FALSE;
+
+    InitNTQueryInterface();
+}
+
+void ProcessInfo::UnInit()
+{
+    if(m_hProcess)
+    {
+        CloseHandle(m_hProcess);
+    }
+
+    if(m_pPrcoInfo)
+    {
+        delete m_pPrcoInfo;
+        m_pPrcoInfo = NULL;
+    }
 }
 
 void ProcessInfo::GetProcessInfo()
@@ -53,7 +71,7 @@ BOOL ProcessInfo::IsDataChange()
 
 CString ProcessInfo::GetProcessName()
 {
-    CString strFullPath = m_pPrcoInfo->strProcessFullPath;
+    CString strFullPath = GetProcessFullPath();
 
     if(strFullPath.IsEmpty())
     {
@@ -61,7 +79,7 @@ CString ProcessInfo::GetProcessName()
     }
 
     int nPos = strFullPath.ReverseFind('\\');
-    strFullPath.Right(strFullPath.GetLength() - nPos);
+    strFullPath = strFullPath.Right(strFullPath.GetLength() - nPos - 1);
 
     return strFullPath;
 }
@@ -115,7 +133,7 @@ DWORD ProcessInfo::GetCpuUsage()
     {
         _last_system_time = system_time;
         _last_time = time;
-        return -2;
+        return 0;
     }
 
     system_time_delta = system_time - _last_system_time;
@@ -200,15 +218,15 @@ CString ProcessInfo::GetMemoryUse()
     SIZE_T sMemSize = pmc.WorkingSetSize;
     if(sMemSize >= 1024 * 1024)
     {
-        strMemSize.Format(L"%0.2 MB", sMemSize / (1024 * 1024));
+        strMemSize.Format(L"%0.2f MB", (float)sMemSize / (1024 * 1024));
     }
     else if(sMemSize > 1024)
     {
-        strMemSize.Format(L"%0.2 KB", sMemSize / (1024));
+        strMemSize.Format(L"%0.2f KB", (float)sMemSize / (1024));
     }
     else
     {
-        strMemSize.Format(L"%0.2 B", sMemSize);
+        strMemSize.Format(L"%0.2f B", (float)sMemSize);
     }
 
     return strMemSize;

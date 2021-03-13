@@ -16,6 +16,7 @@ public:
     typedef LONG (__stdcall *PROCNTQSIP)(HANDLE,UINT,PVOID,ULONG,PULONG);
 
     void Init(HANDLE hProcess, DWORD dwProcessID);
+    void UnInit();
     void GetProcessInfo();
     BOOL IsDataChange();
 

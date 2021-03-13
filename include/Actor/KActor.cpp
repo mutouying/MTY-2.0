@@ -1,7 +1,7 @@
 #include "KActor.h"
 #include <process.h>
 #include <atlbase.h>
-#include <atlapp.h>
+#include "atlapp.h"
 //#include "include/framework/SetThreadName.h"
 
 #define	WAIT_THREAD_TIMEOUT				(200LL)

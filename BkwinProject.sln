@@ -3,6 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BkwinProject", "BkwinProject\BkwinProject.vcproj", "{514B312A-DD1B-4A7D-9953-5AF96818A799}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kprocmgrex", "..\kprocmgrex\kprocmgrex.vcproj", "{6B0BD207-F0C1-4C66-9074-CE06F67DCBED}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProcessMgrDll", "ProcessMgrDll\ProcessMgrDll.vcproj", "{78FB8CB9-2888-4D18-A40D-8557C3F6B693}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProcessMgrTest", "ProcessMgrTest\ProcessMgrTest.vcproj", "{9F8B8FB7-EAF3-4276-B1DD-F3F9E90164D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +19,18 @@ Global
 		{514B312A-DD1B-4A7D-9953-5AF96818A799}.Debug|Win32.Build.0 = Debug|Win32
 		{514B312A-DD1B-4A7D-9953-5AF96818A799}.Release|Win32.ActiveCfg = Release|Win32
 		{514B312A-DD1B-4A7D-9953-5AF96818A799}.Release|Win32.Build.0 = Release|Win32
+		{6B0BD207-F0C1-4C66-9074-CE06F67DCBED}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6B0BD207-F0C1-4C66-9074-CE06F67DCBED}.Debug|Win32.Build.0 = Debug|Win32
+		{6B0BD207-F0C1-4C66-9074-CE06F67DCBED}.Release|Win32.ActiveCfg = Release|Win32
+		{6B0BD207-F0C1-4C66-9074-CE06F67DCBED}.Release|Win32.Build.0 = Release|Win32
+		{78FB8CB9-2888-4D18-A40D-8557C3F6B693}.Debug|Win32.ActiveCfg = Debug|Win32
+		{78FB8CB9-2888-4D18-A40D-8557C3F6B693}.Debug|Win32.Build.0 = Debug|Win32
+		{78FB8CB9-2888-4D18-A40D-8557C3F6B693}.Release|Win32.ActiveCfg = Release|Win32
+		{78FB8CB9-2888-4D18-A40D-8557C3F6B693}.Release|Win32.Build.0 = Release|Win32
+		{9F8B8FB7-EAF3-4276-B1DD-F3F9E90164D0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9F8B8FB7-EAF3-4276-B1DD-F3F9E90164D0}.Debug|Win32.Build.0 = Debug|Win32
+		{9F8B8FB7-EAF3-4276-B1DD-F3F9E90164D0}.Release|Win32.ActiveCfg = Release|Win32
+		{9F8B8FB7-EAF3-4276-B1DD-F3F9E90164D0}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
