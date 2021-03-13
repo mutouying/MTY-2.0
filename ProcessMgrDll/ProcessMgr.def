@@ -1,0 +1,4 @@
+LIBRARY	"ProcessMgrDll"
+
+EXPORTS
+	DllQueryInterface    PRIVATE
