@@ -23,12 +23,16 @@ KBkwinDemoDlg::~KBkwinDemoDlg()
 		delete m_pMenu;
 		m_pMenu = NULL;
 	}
+
+    UnRegisterIpcServer();
 }
 
 BOOL KBkwinDemoDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
-	testCode();
-	UpdateWindowsUI();
+	//testCode();
+	//UpdateWindowsUI();
+    RegisterIpcServer();
+    LoadMule();
     return TRUE;
 }
 
@@ -61,6 +65,95 @@ void KBkwinDemoDlg::OnBtnMin()
 	GetWindowRect(&m_oldRect);
 }
 
+
+BOOL KBkwinDemoDlg::LoadMule()
+{
+    HMODULE    hModule  = NULL;
+
+    typedef IUnknown* (__stdcall *CreateObj_fun)(const IID * iid);
+
+    hModule = ::LoadLibraryW(L"E:\\WorkSpace\\MTY-2.0-GitTest\\bin\\ProcessMgrDll.dll");
+    if (NULL == hModule)
+    {
+        return FALSE;
+    }
+
+    CreateObj_fun fn = (CreateObj_fun)GetProcAddress(hModule, "DllQueryInterface");
+    if (NULL == fn)
+    {
+        return FALSE;
+    }
+
+    IBaseProcessMgr* pBootPop = (IBaseProcessMgr*)fn(&__uuidof(IBaseProcessMgr));
+    if(pBootPop == NULL)
+        return FALSE;
+
+    pBootPop->Init();
+}
+
+void KBkwinDemoDlg::RegisterIpcServer()
+{
+    m_strIpcName1 = ipc_first_load_process;
+    EASYIPC_REGISTER_METHODEX(m_strIpcName1, KBkwinDemoDlg, FirstLoadProcess, this); 
+    EASYIPC_START_INTERFACEEX(m_strIpcName1);
+
+    m_strIpcName2 = ipc_first_load_process_end;
+    EASYIPC_REGISTER_METHODEX(m_strIpcName2, KBkwinDemoDlg, FirstLoadEnd, this); 
+    EASYIPC_START_INTERFACEEX(m_strIpcName2);
+
+    m_strIpcName3 = ipc_refresh_process;
+    EASYIPC_REGISTER_METHODEX(m_strIpcName3, KBkwinDemoDlg, RefreshProcess, this); 
+    EASYIPC_START_INTERFACEEX(m_strIpcName3);
+}
+
+void KBkwinDemoDlg::UnRegisterIpcServer()
+{
+    EASYIPC_STOP_INTERFACEEX(m_strIpcName1); 
+    EASYIPC_UNREGISTEREX(m_strIpcName1);
+
+    EASYIPC_STOP_INTERFACEEX(m_strIpcName2); 
+    EASYIPC_UNREGISTEREX(m_strIpcName1);
+
+    EASYIPC_STOP_INTERFACEEX(m_strIpcName3); 
+    EASYIPC_UNREGISTEREX(m_strIpcName1);
+}
+
+int KBkwinDemoDlg::FirstLoadProcess(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*)
+{
+    KLocker locker(m_csNewItemNotify);
+
+    SetProcessInfo newItem;
+
+    newItem.strProcessFullPath = pParam->GetString(L"strProcessFullPath", NULL);
+    newItem.strProcessName = pParam->GetString(L"strProcessName", NULL);
+    newItem.dwProcessID = pParam->GetInt(L"dwProcessID", 0);
+    newItem.dwCpuUsage = pParam->GetInt(L"dwCpuUsage", 0);
+    newItem.strMemoryUser = pParam->GetString(L"strMemoryUser", 0);
+    newItem.strUserName = pParam->GetString(L"strUserName", 0);
+    newItem.dwParentPID = pParam->GetInt(L"dwParentPID", 0);
+    newItem.dwHandleCount = pParam->GetInt(L"dwHandleCount", 0);
+    newItem.dwThreadCount = pParam->GetInt(L"dwThreadCount", 0);
+    newItem.dwSessionID = pParam->GetInt(L"dwSessionID", 0);
+
+    DWORD dwProcessId = pParam->GetInt(L"dwProcessID", 0);
+
+    m_mapProCache[dwProcessId] = newItem;
+
+    return 0;
+}
+
+int KBkwinDemoDlg::FirstLoadEnd(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*)
+{
+    UpdateCacheMapToRealMap();
+    UpdateWindowsUI();
+
+    return 0;
+}
+
+int KBkwinDemoDlg::RefreshProcess(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*)
+{
+    return 0;
+}
 
 void KBkwinDemoDlg::OnBtnClose()
 {
@@ -128,19 +221,21 @@ void KBkwinDemoDlg::UpdateWindowsUI()
 	{
 		return;
 	}
-	DeleteAllListItem(IDC_LIST_PROC);
+	//DeleteAllListItem(IDC_LIST_PROC);
 
 
 	// TODO 第一列的行头在 这里添加
-	AddOnekeyToListWnd( SetProcessInfo() , 0);
+	//AddOnekeyToListWnd( SetProcessInfo() , 0);
 
-	int nIndex = 1;
-	for (map<DWORD, SetProcessInfo>::iterator it= m_mapProInfo.begin();
+	int nIndex = 0;
+	/*for (map<DWORD, SetProcessInfo>::iterator it= m_mapProInfo.begin();
 		it != m_mapProInfo.end(); ++it)
 	{
 		SetProcessInfo info = it->second;
 		AddOnekeyToListWnd(info, nIndex++);
-	}
+	}*/
+    map<DWORD, SetProcessInfo>::iterator it= m_mapProInfo.begin();
+    AddOnekeyToListWnd((*it).second, nIndex++);
 	UpdateLayoutList(IDC_LIST_PROC);
 
 	SendMessage(WM_PAINT);

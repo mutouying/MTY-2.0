@@ -7,6 +7,10 @@
 #include "ProcessMgr/ProcessDefineEx.h"
 #include "framework/KTinyXml.h"
 
+#include "EasyIpc/easyipcserverwrap.h"
+#include "framework/KLocker.h"
+#include "ProcessMgr/IBaseProcessMgr.h"
+
 using namespace std;
 class KBkwinDemoDlg
     : public CBkDialogViewImplEx<KBkwinDemoDlg>
@@ -70,8 +74,21 @@ protected:
 protected:
 	CBkDialogMenu* m_pMenu;
 
+private:
+    BOOL LoadMule();
+    void RegisterIpcServer();
+    void UnRegisterIpcServer();
+    int FirstLoadProcess(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*);
+    int FirstLoadEnd(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*);
+    int RefreshProcess(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*);
+
 	map<DWORD, SetProcessInfo> m_mapProInfo;
 	map<DWORD, SetProcessInfo> m_mapProCache;
 private:
 	RECT					m_oldRect;
+
+    KCriticalSesion  m_csNewItemNotify;
+    CString m_strIpcName1;
+    CString m_strIpcName2;
+    CString m_strIpcName3;
 };
