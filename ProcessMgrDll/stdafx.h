@@ -40,3 +40,6 @@ extern CAppModule _Module;
 
 #include <shlguid.h>
 
+
+#include "psapi.h"
+#pragma   comment   (lib, "psapi.lib ")

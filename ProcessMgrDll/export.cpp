@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 
 #include "ProcessMgr/IBaseProcessMgr.h"
-#include "ProcessView/KBaseProcessMgr.h"
+#include "ProcessView/BaseProcessMgr.h"
 
 // -------------------------------------------------------------------------
 

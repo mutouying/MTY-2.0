@@ -300,8 +300,48 @@
 				</File>
 			</Filter>
 			<Filter
+				Name="actor"
+				>
+				<File
+					RelativePath="..\include\Actor\KActor.cpp"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\include\Actor\KActor.h"
+					>
+				</File>
+			</Filter>
+			<Filter
 				Name="easyipc"
 				>
+				<File
+					RelativePath="..\include\ascore\asdefines.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\ascore\ashelper.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\ascore\ashelper.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\ascore\winmodule.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\ascore\winmodule.hpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="define"
@@ -315,16 +355,72 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="framework"
+				>
+				<File
+					RelativePath="..\include\ddx\kbundle.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\ddx\kbundle.h"
+					>
+				</File>
+				<File
+					RelativePath="..\publish\systemopt\KCheckVersion.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\framework\KEvent.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\framework\KLocker.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\infoc\KProduceType.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\framework\KRegister2.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\framework\KTime.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\framework\KTime.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="ProcessView"
 			>
 			<File
-				RelativePath=".\ProcessView\KBaseProcessMgr.cpp"
+				RelativePath=".\ProcessView\BaseProcessMgr.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\ProcessView\KBaseProcessMgr.h"
+				RelativePath=".\ProcessView\BaseProcessMgr.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ProcessView\ProcessInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ProcessView\ProcessInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ProcessView\ProcessMonitor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ProcessView\ProcessMonitor.h"
 				>
 			</File>
 		</Filter>
