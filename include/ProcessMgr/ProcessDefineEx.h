@@ -7,7 +7,7 @@ typedef struct tagSetProcessInfo
 	CString strProcessFullPath;   //进程全路径
     DWORD dwProcessID;  //进程ID
     DWORD dwCpuUser;   //CPU占用
-    DWORD dwMemoryUser;   //内存占用
+    CString dwMemoryUser;   //内存占用
 
     CString strUserName;// 用户名
     DWORD dwParentPID;	//父进程PID
@@ -19,7 +19,6 @@ typedef struct tagSetProcessInfo
     {
 		dwProcessID = 0;
 		dwCpuUser = 0;   //CPU占用
-		dwMemoryUser  = 0;   // 内存占用（单位：B）
 		
 		dwParentPID = 0;	//父进程PID
 		dwSessionID = 0;	//会话ID
@@ -32,7 +31,6 @@ typedef struct tagSetProcessInfo
 		// 测试的构造函数 
 		dwParentPID = dwPid;
 		dwCpuUser = 0;   //CPU占用
-		dwMemoryUser  = 0;   // 内存占用（单位：B）
 
 		dwParentPID = 0;	//父进程PID
 		dwSessionID = 0;	//会话ID
