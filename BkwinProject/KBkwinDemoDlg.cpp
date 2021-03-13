@@ -23,6 +23,7 @@ KBkwinDemoDlg::~KBkwinDemoDlg()
 
 BOOL KBkwinDemoDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
+	testCode();
     return TRUE;
 }
 
@@ -58,39 +59,34 @@ void KBkwinDemoDlg::OnBtnMin()
 
 void KBkwinDemoDlg::OnBtnClose()
 {
-	// TODO  save to 注册表
-
-	ShowWindow(SW_HIDE);
 	EndDialog(IDCANCEL);
 }
 
 void KBkwinDemoDlg::OnSetting()
 {
 	SettingDlg m_settingDlg;
-	m_settingDlg.DoModal();
-// 	KChildDlg m_settingDlg;            
-// 	if(m_settingDlg.DoModal(GetViewHWND(),NULL)==IDOK)
-// 	{
-// 		CGlobalSetting::m_GlobalFlag.uColumnChoosed=m_settingDlg.uFunRet;
-// 	}
-// 	else
-// 	{
-// 		return;
-// 	}
-// 	m_wndListProcessInfo.m_list.DeleteAllItems(); // row	
-// 
-// 	m_wndListProcessInfo.m_list.DeleteColumns();  // header
-// 
-// 
-// 	// modlue info
-// 	_DeleteAllModuleInfo();
-// 	// init header
-// 	_InitListCtrlHeader();
-// 	_RefreshListCtrl(m_mapCopy, TRUE);
-// 	m_wndListProcessInfo.SetScrollPos(SB_HORZ, 0);
-// 	m_wndListProcessInfo.ResetScrollBars(SB_HORZ, 0, FALSE);
-// 	m_wndListProcessInfo.m_list.SetItemHighligth(0, -1, 0, 0);
-// 	m_wndListProcessInfo.m_list.ResetScrollBars();
-// 	m_wndListProcessInfo.m_list.Invalidate();
+	
+ 	if(m_settingDlg.DoModal()==IDOK)
+ 	{
+		// 确定，有更改数据，更新画面
+ 		
+ 	}
+ 	else
+ 	{
+ 		// 不需要变化
+ 	}
+	return;
+}
+
+void KBkwinDemoDlg::testCode()
+{
+	m_mapProInfo.clear();
+	for(DWORD i = 0; i< 200; ++i)
+	{
+		SetProcessInfo info(i);
+		m_mapProInfo.insert(make_pair(i, info));
+	}
 
 }
+
+

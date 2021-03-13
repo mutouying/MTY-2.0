@@ -16,7 +16,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="..\bin"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="1"
@@ -112,6 +112,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/wd4430"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;..\Microsoft SDKs\Windows\v6.1\Include&quot;;..\include;..\;..\publish;..\publish\wtl;.\"
 				RuntimeLibrary="2"

@@ -4,28 +4,28 @@
     <imgbtn id="100" pos="-72,0" skin="dlg_btn_min"/>
     <!--<imgbtn id="101" pos="-72,0,31,17" skin="dlg_btn_fullwnd"/>-->
     <imgbtn id="102" pos="-40,0"  skin="dlg_btn_close"/>
-    <text id="400" class="text_title" pos="25,10">进程管理器</text>
+    <text  class="text_title" pos="25,10">进程管理器</text>
     <imgbtn id="103" pos="-151,4"  class="linkimage"  skin="menu_setting"/>
     <text id="103"  pos="-132,6"  crtext="FFFFFF">设置</text>
   </header>
 
   <body crbg="fbfbfb" width="full" height="full" >
   
-    <dlg id="139" pos="0,0,-0,65"  crbg="f3f3f3">
+    <dlg id="200" pos="0,0,-0,65"  crbg="f3f3f3">
       <img pos="25,9" skin="logo_big" />
       <!--<text pos="93,17,183" font="0004" crtext="5a9deb">正在运行进程:</text>^
       <text id="800" pos="184,17" font="0004" crtext="5a9deb"></text>-->
      
       <text pos="108,41">CPU占用:</text>
-      <text id="801" pos="160,41"></text>
+      <text id="201" pos="160,41"></text>
       <text pos="227,41">内存占用:</text>
-      <text id="802" pos="280,41"></text>
-      <imgbtn id="80001"  pos="-129,22"  skin="dlg_btn_over" class="linkimage"  ></imgbtn>
+      <text id="202" pos="280,41"></text>
+      <imgbtn id="203"  pos="-129,22"  skin="dlg_btn_over" class="linkimage"  ></imgbtn>
       
     </dlg>
     
     <!-- 进程信息-->
-    <!--<listwnd id="448" pos="0,64,-0,-25" />-->
+    <listwnd id="1000" pos="0,64,-0,-25" />
     
   </body>
 </layer>
