@@ -113,7 +113,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;..\..\bkwin;..\..\bkwin\wtl"
+				AdditionalIncludeDirectories="&quot;..\Microsoft SDKs\Windows\v6.1\Include&quot;;..\include;..\;..\publish;..\publish\wtl;.\"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"

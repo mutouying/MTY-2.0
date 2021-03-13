@@ -16,16 +16,9 @@ public:
 
     enum
     {
-//         IDC_BTN_CLOSE = 1000,
-// 		IDC_BTN_CTRL_SET = 2000,
-// 		IDC_BTN_DEMO_LISTWND = 2001,
-// 		IDC_BTN_DEMO_MENU = 2002,
-
-
 		IDC_BTN_MIN								=	100,
 		IDC_BTN_CLOSE							=	102,
-		IDC_BTN_SETTING							=	80002,
-
+		IDC_BTN_SETTING							=	103,
     };
 
 protected:

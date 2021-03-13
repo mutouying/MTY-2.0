@@ -1,16 +1,15 @@
 ﻿<layer title="BkwinProject" width="800" height="570" appwin="1" resize="0" maximize="1" >
   <header crbg="5a9deb" width="full" height="30">
+    <img pos="6,8" skin="logo"/>
     <imgbtn id="100" pos="-72,0" skin="dlg_btn_min"/>
     <!--<imgbtn id="101" pos="-72,0,31,17" skin="dlg_btn_fullwnd"/>-->
     <imgbtn id="102" pos="-40,0"  skin="dlg_btn_close"/>
-    
-    <img pos="6,8" skin="logo"/>
     <text id="400" class="text_title" pos="25,10">进程管理器</text>
-    <imgbtn id="80002" pos="-151,4"  class="linkimage"  skin="menu_setting"/>
-    <text id="80002"  pos="-132,6"  crtext="FFFFFF">设置</text>
+    <imgbtn id="103" pos="-151,4"  class="linkimage"  skin="menu_setting"/>
+    <text id="103"  pos="-132,6"  crtext="FFFFFF">设置</text>
   </header>
 
-  <body crbg="ffffff" width="full" height="full" >
+  <body crbg="fbfbfb" width="full" height="full" >
   
     <dlg id="139" pos="0,0,-0,65"  crbg="f3f3f3">
       <img pos="25,9" skin="logo_big" />
@@ -19,10 +18,8 @@
      
       <text pos="108,41">CPU占用:</text>
       <text id="801" pos="160,41"></text>
-     
       <text pos="227,41">内存占用:</text>
       <text id="802" pos="280,41"></text>
-      
       <imgbtn id="80001"  pos="-129,22"  skin="dlg_btn_over" class="linkimage"  ></imgbtn>
       
     </dlg>
