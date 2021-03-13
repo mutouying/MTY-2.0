@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "KBkwinDemoDlg.h"
 
-#include "DemoCmnCtrlSetDlg.h"
 #include "SettingDlg.h"
 
 KBkwinDemoDlg::KBkwinDemoDlg()

@@ -9,12 +9,24 @@ SettingDlg::SettingDlg()
 
 BOOL SettingDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
+	InitSeting();
     return TRUE;
 }
 
 void SettingDlg::OnBtnClose()
 {
     EndDialog(IDCLOSE);
+}
+
+void SettingDlg::OnBtnCancle()
+{
+	EndDialog(IDCANCEL);
+}
+
+void SettingDlg::OnBtnConfirm()
+{
+	SaveSetting();
+	EndDialog(IDOK);
 }
 
 void SettingDlg::OnSysCommand(UINT nID, CPoint point)
@@ -32,25 +44,24 @@ void SettingDlg::OnSysCommand(UINT nID, CPoint point)
     }
 }
 
-void SettingDlg::OnListItemLBtnUp(int nListItem)
-{
-	BkSharePtr<CString> strMsg = BkSharePtr<CString>::createObject();
 
-	strMsg.DataRef().Format(L"DemoListWndDlg::OnListItemLBtnUp:%d", nListItem);
-	PostRunnable(BkWin::FuncFactory::create_class_func(this, &SettingDlg::ShowDoModalMsgBox, strMsg));
-}
 
 void SettingDlg::ShowDoModalMsgBox(BkSharePtr<CString> msg)
 {
 	MessageBox(msg.DataRef());
 }
 
-void SettingDlg::OnListItemChildLBtnUp(int nListItem, int nChildCtrlId)
+
+void SettingDlg::InitSeting()
 {
-	BkSharePtr<CString> strMsg = BkSharePtr<CString>::createObject();
-	
-	strMsg.DataRef().Format(L"DemoListWndDlg::OnListItemChildLBtnUp:%d %d", nListItem, nChildCtrlId);
-	PostRunnable(BkWin::FuncFactory::create_class_func(this, &SettingDlg::ShowDoModalMsgBox, strMsg));
+	// SetItemCheck(ID_CHECK_CPUCurrentUsage , (CGlobalSetting::m_GlobalFlag.uColumnChoosed & defCPUCurrentUsage)>0);
 }
 
+void SettingDlg::SaveSetting()
+{
+	(uFunRet) = 0;
+// 	if ( GetItemCheck(ID_CHECK_CPUCurrentUsage) )
+// 		uFunRet |= defCPUCurrentUsage;
 
+	// CGlobalSetting::m_GlobalFlag.uColumnChoosed = uFunRet;
+}
