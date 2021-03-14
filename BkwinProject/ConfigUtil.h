@@ -14,12 +14,12 @@
 #define FlagProcessSession				0x00000200
 
 #define  KEY_FLAG_SET L"key_flag_set"
-#define  KEY_SELECT L"key_select_sum"
+#define  KEY_SELECT_SUM L"key_select_sum"
 
 class ConfigUtil
 {
 public:
-	ConfigUtil GetInstace()
+	static ConfigUtil GetInstace()
 	{
 		static  ConfigUtil config = ConfigUtil();
 		return config;
@@ -27,24 +27,26 @@ public:
 
 	unsigned int GetFlagSet()
 	{
+		LoadConfig();
 		return m_flagSet;
 	}
 
-	void SetFlagSet(unsigned int flag)
-	{
-		m_flagSet = flag;
-	}
+// 	void SetFlagSet(unsigned int flag)
+// 	{
+// 		m_flagSet = flag;
+// 	}
 
 	unsigned int GetSelectSum()
 	{
+		LoadConfig();
 		return m_SelectSum;
 	}
 
-	void SetSelectSum(int sum)
-	{
-		m_SelectSum = sum;
-	}
-	
+// 	void SetSelectSum(int sum)
+// 	{
+// 		m_SelectSum = sum;
+// 	}
+// 	
 
 
 public:
@@ -55,6 +57,7 @@ public:
 	BOOL Read(LPCTSTR szValueName, CString& strValue);
 	BOOL Write(LPCTSTR szValueName, DWORD dwValue);
 	BOOL Write(LPCTSTR szValueName, LPCTSTR szValue);
+	BOOL LoadConfig();
 
 private:
 
@@ -62,3 +65,5 @@ private:
 	int   m_SelectSum;
 
 };
+
+#define ConfigUtilInst  ConfigUtil::GetInstace()

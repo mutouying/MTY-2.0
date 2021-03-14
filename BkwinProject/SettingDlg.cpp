@@ -12,6 +12,8 @@ SettingDlg::SettingDlg()
 
 BOOL SettingDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
+	m_flagSet = ConfigUtilInst.GetFlagSet();
+	m_SelectSum = ConfigUtilInst.GetSelectSum();
 	InitSeting();
     return TRUE;
 }
@@ -28,7 +30,6 @@ void SettingDlg::OnBtnCancle()
 
 void SettingDlg::OnBtnConfirm()
 {
-
 	SaveSetting();
 	EndDialog(IDOK);
 }
@@ -58,7 +59,16 @@ void SettingDlg::ShowDoModalMsgBox(BkSharePtr<CString> msg)
 
 void SettingDlg::InitSeting()
 {
-	// SetItemCheck(ID_CHECK_CPUCurrentUsage , (CGlobalSetting::m_GlobalFlag.uColumnChoosed & defCPUCurrentUsage)>0);
+	SetItemCheck(ID_CHECK_PRO_NAME , (m_flagSet & FlagProcessName)>0);
+	SetItemCheck(ID_CHECK_PRO_ID , (m_flagSet & FlagProcessPid)>0);
+	SetItemCheck(ID_CHECK_PRO_PATH , (m_flagSet & FlagProcessPath)>0);
+	SetItemCheck(ID_CHECK_PRO_CPU , (m_flagSet & FlagProcessCpu)>0);
+	SetItemCheck(ID_CHECK_PRO_MEM , (m_flagSet & FlagProcessMem)>0);
+	SetItemCheck(ID_CHECK_PRO_EXT_1 , (m_flagSet & FlagProcessUser)>0);
+	SetItemCheck(ID_CHECK_PRO_EXT_2 , (m_flagSet & FlagProcessParent)>0);
+	SetItemCheck(ID_CHECK_PRO_EXT_3 , (m_flagSet & FlagProcessHandle)>0);
+	SetItemCheck(ID_CHECK_PRO_EXT_4 , (m_flagSet & FlagProcessThread)>0);
+	SetItemCheck(ID_CHECK_PRO_EXT_5 , (m_flagSet & FlagProcessSession)>0);
 }
 
 void SettingDlg::SaveSetting()
@@ -125,6 +135,7 @@ void SettingDlg::SaveSetting()
 		m_flagSet |= FlagProcessSession;
 		m_SelectSum ++;
 	}
-
-	// CGlobalSetting::m_GlobalFlag.uColumnChoosed = uFunRet;
+	
+	ConfigUtilInst.Write(KEY_FLAG_SET, m_flagSet);
+	ConfigUtilInst.Write(KEY_SELECT_SUM, m_SelectSum);
 }
