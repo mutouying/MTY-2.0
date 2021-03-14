@@ -15,7 +15,7 @@ DEFINE_XML(IDR_DLG_DEMO_SETTING, 101, "res\\xml\\dlg_setting.xml")
 // PNG
 //DEFINE_PNG(IDP_BTN_CLOSE,               2000,   "res\\png\\btn_sys_close.png")
 //DEFINE_PNG(IDP_2001,               2001,   "res\\png\\btn_sys_min.png")
-//DEFINE_PNG(IDP_SHADOW,               2002,   "res\\png\\shadow.png")
+DEFINE_PNG(IDP_SHADOW,               2002,   "res\\png\\shadow.png")
 //DEFINE_PNG(IDP_2003,               2003,   "res\\png\\btn_cmn.png")
 //DEFINE_PNG(IDP_2004,               2004,   "res\\png\\wallpaper_image.png")
 //DEFINE_PNG(IDP_2005,               2005,   "res\\png\\menu_icons.png")

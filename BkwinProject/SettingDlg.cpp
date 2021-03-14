@@ -5,6 +5,7 @@
 SettingDlg::SettingDlg()
     : CBkDialogViewImplEx<SettingDlg>(IDR_DLG_DEMO_SETTING)
 {
+	BkWin::WndShadowHelper<SettingDlg>::SetShadowData(12, IDP_SHADOW);
 	m_flagSet = 0;
 	m_SelectSum = 0;
 	
