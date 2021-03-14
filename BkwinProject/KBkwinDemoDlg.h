@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "bkres/bkres.h"
 #include "bkwin/CBkDialogViewImplEx.h"
 #include "bkwin/bkshadowdrawable.h"
@@ -11,9 +12,11 @@
 #include "framework/KLocker.h"
 #include "ProcessMgr/IBaseProcessMgr.h"
 #include "framework/KEvent.h"
+#include "framework/KCreateXmlElementFunc.h"
 #include "Actor/KActor.h"
 
 #define WM_DELAY_LOADDATA  WM_USER + 100
+#define LIST_ITEM_WIDTH    1000
 
 using namespace std;
 class KBkwinDemoDlg
@@ -36,6 +39,7 @@ public:
 
 		IDC_LIST_PROC							= 1000,
 		IDC_LIST_KEY							= 1001,
+        IDC_DLG_HEADER = 300,
     };
 
 protected:
@@ -58,7 +62,6 @@ protected:
         MSG_WM_SYSCOMMAND(OnSysCommand)
 
         MESSAGE_HANDLER_EX(WM_DELAY_LOADDATA, OnDelayInit)
-	
 		CHAIN_MSG_MAP(CBkDialogViewImplEx<KBkwinDemoDlg>)
         REFLECT_NOTIFICATIONS_EX()
     END_MSG_MAP()
@@ -77,10 +80,13 @@ protected:
 	void UpdateConfig();
 	BOOL AddTableTitleToListWnd();
 	void UpdateWindowsUI();
-	BOOL AddOnekeyToListWnd(SetProcessInfo& data , int nIndex);
-	BOOL CreateHotkeyListItemXml(SetProcessInfo & data, KTinyXml tinyXml, int nIndex );
+	BOOL AddListItem(SetProcessInfo& data , int nIndex);
+	BOOL CreateListItemXml(SetProcessInfo & data, KTinyXml tinyXml, int nIndex );
 	void testCode();
-	void UpdateCacheMapToRealMap();
+	//void UpdateCacheMapToRealMap();
+
+    BOOL AddListItemChilds(SetProcessInfo & data, KCreateXmlElementFunc& XmlElFunc);
+
 	int OnBtnKillProcess();
 	int KillProcessById(int pid);
 	virtual void   OnActivate(KActor* pActor);
@@ -93,18 +99,23 @@ protected:
 	CBkDialogMenu* m_pMenu;
 
 private:
-    BOOL LoadMule();
+    BOOL LoadModule();
     void RegisterIpcServer();
     void UnRegisterIpcServer();
     int FirstLoadProcess(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*);
     int FirstLoadEnd(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*);
     int RefreshProcess(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*);
+    BOOL RefreshListHeader(KTinyXml& tinyXml, int nLeftPos, int nRightPos, const CString& strValue);
+    void LoadRowData(SetProcessInfo & processData, std::vector<CString>& vecRowData);
+    void LoadHeaderData(std::vector<CString>& vecHeaderData);
+
+    void CreateListHeader();
 
 	map<DWORD, SetProcessInfo> m_mapProInfo;
 	map<DWORD, SetProcessInfo> m_mapProCache;
 private:
 	// RECT	m_oldRect;
-	int		m_nItemWidth;
+	//int		m_nItemWidth;
 	unsigned int   m_flagSet; 
 	int   m_SelectSum;
 
@@ -114,10 +125,18 @@ private:
     CString m_strIpcName3;
     KEvent m_evtFirsetLoadEnd;
 
+
+    IBaseProcessMgr* m_pProcessMgr;
+
+    BOOL m_bRefreshHeader;
+    HMODULE    m_hModule;
+    std::vector<CString> m_vecHeaderData;
+
 	int   m_nPid;
 	KActor m_atorLogic;
 	KEvent m_evtKillProcess;
 	KEvent m_evtOutputAllProcess;
 	KEvent m_evtOpenFilePos;
 	KEvent m_evtOpenFileAtt;
+    CBkDialog* m_pTitleDlg;
 };

@@ -3,7 +3,6 @@
 #include "SettingDlg.h"
 
 #include "framework/KTinyXml.h"
-#include "framework/KCreateXmlElementFunc.h"
 #include "ConfigUtil.h"
 #include <fstream>
 #include <string>
@@ -15,15 +14,18 @@
 
 KBkwinDemoDlg::KBkwinDemoDlg()
     : CBkDialogViewImplEx<KBkwinDemoDlg>(IDR_MAIN)
+    , m_flagSet(0)
+    , m_SelectSum(0)
 {
+    m_hModule = NULL;
 	BkWin::WndShadowHelper<KBkwinDemoDlg>::SetShadowData(12, IDP_SHADOW);
     RegisterIpcServer();
-    LoadMule();
+    LoadModule();
     m_evtFirsetLoadEnd.Create(NULL, TRUE, FALSE);
 	m_pMenu = NULL;
-	m_nItemWidth = ITEM_WIDTH;
-	m_flagSet = 0;
-	m_SelectSum =0;
+    m_pProcessMgr = NULL;
+    m_bRefreshHeader = FALSE;
+    m_pTitleDlg = NULL;
 
 	m_nPid = 0;
 	m_evtKillProcess.Create(NULL, TRUE, FALSE);
@@ -44,14 +46,29 @@ KBkwinDemoDlg::~KBkwinDemoDlg()
 	}
 
     UnRegisterIpcServer();
+    if(m_pProcessMgr)
+    {
+        m_pProcessMgr->UnInit();
+        m_pProcessMgr->Drop();
+        m_pProcessMgr = NULL;
+    }
+    if(m_hModule)
+    {
+        FreeLibrary(m_hModule);
+        m_hModule = NULL;
+    }
 }
 
 BOOL KBkwinDemoDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
 	//testCode();
 	//UpdateWindowsUI();
+    UpdateConfig();
+    LoadHeaderData(m_vecHeaderData);
+    RegisterIpcServer();
     PostMessage(WM_DELAY_LOADDATA);
-    LoadMule();
+    LoadModule();
+
     return TRUE;
 }
 
@@ -95,9 +112,9 @@ void KBkwinDemoDlg::OnBtnMin()
 }
 
 
-BOOL KBkwinDemoDlg::LoadMule()
+BOOL KBkwinDemoDlg::LoadModule()
 {
-    HMODULE    hModule  = NULL;
+    m_hModule  = NULL;
 
     typedef IUnknown* (__stdcall *CreateObj_fun)(const IID * iid);
 
@@ -108,23 +125,23 @@ BOOL KBkwinDemoDlg::LoadMule()
 	CString strPath = strModule.Left(pos);
 	strPath.AppendFormat(L"\\ProcessMgrDll.dll");
 
-    hModule = ::LoadLibraryW(strPath);
-    if (NULL == hModule)
+    m_hModule = ::LoadLibraryW(strPath);
+    if (NULL == m_hModule)
     {
         return FALSE;
     }
 
-    CreateObj_fun fn = (CreateObj_fun)GetProcAddress(hModule, "DllQueryInterface");
+    CreateObj_fun fn = (CreateObj_fun)GetProcAddress(m_hModule, "DllQueryInterface");
     if (NULL == fn)
     {
         return FALSE;
     }
 
-    IBaseProcessMgr* pProcessMgr = (IBaseProcessMgr*)fn(&__uuidof(IBaseProcessMgr));
-    if(pProcessMgr == NULL)
+    m_pProcessMgr = (IBaseProcessMgr*)fn(&__uuidof(IBaseProcessMgr));
+    if(m_pProcessMgr == NULL)
         return FALSE;
 
-    pProcessMgr->Init();
+    m_pProcessMgr->Init();
 }
 
 void KBkwinDemoDlg::RegisterIpcServer()
@@ -173,16 +190,15 @@ int KBkwinDemoDlg::FirstLoadProcess(easyipc::IEasyIpcBundle* pParam, easyipc::IE
 
     DWORD dwProcessId = pParam->GetInt(L"dwProcessID", 0);
 
-    m_mapProCache[dwProcessId] = newItem;
+    m_mapProInfo[dwProcessId] = newItem;
 
     return 0;
 }
 
 int KBkwinDemoDlg::FirstLoadEnd(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*)
 {
-    UpdateCacheMapToRealMap();
+    //UpdateCacheMapToRealMap();
     m_evtFirsetLoadEnd.SetEvent();
-    //UpdateWindowsUI();
 
     return 0;
 }
@@ -190,6 +206,48 @@ int KBkwinDemoDlg::FirstLoadEnd(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyI
 int KBkwinDemoDlg::RefreshProcess(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*)
 {
     return 0;
+}
+
+BOOL KBkwinDemoDlg::RefreshListHeader(KTinyXml& tinyXml, int nLeftPos, int nRightPos, const CString& strValue)
+{
+    BOOL bReturn = FALSE;
+    CString strPos;
+    CStringA strXml;
+    //KTinyXml tinyXml;
+
+    tinyXml.Open("Root", TRUE);
+    KTinyXmlRememberPos(tinyXml);
+
+    KCreateXmlElementFunc XmlElFunc(tinyXml);
+
+    bReturn = XmlElFunc.AddTinyChild("text", 100, NULL, NULL, NULL, NULL, "1");
+    if(!bReturn)
+        goto Exit;
+
+    strPos.Format(L"%d,0,%d,-0", nLeftPos, nRightPos);
+    bReturn = XmlElFunc().Write("pos", strPos);
+    if(!bReturn)
+        goto Exit;
+
+    bReturn = XmlElFunc().Write("crtext", "999999");
+    if(!bReturn)
+        goto Exit;
+
+    bReturn = XmlElFunc().Write("show", 1);
+    if(!bReturn)
+        goto Exit;
+
+    bReturn = XmlElFunc().Write("class", "text_center");
+    if(!bReturn)
+        goto Exit;
+
+    bReturn = XmlElFunc().WriteText(CT2A(strValue));
+    if(!bReturn)
+        goto Exit;
+
+
+Exit:
+    return bReturn;
 }
 
 void KBkwinDemoDlg::OnBtnClose()
@@ -220,11 +278,149 @@ void KBkwinDemoDlg::testCode()
 
 }
 
-void KBkwinDemoDlg::UpdateCacheMapToRealMap()
-{
-	m_mapProInfo.clear();
-	m_mapProInfo.insert(m_mapProCache.begin(), m_mapProCache.end());
+//void KBkwinDemoDlg::UpdateCacheMapToRealMap()
+//{
+//	m_mapProInfo.clear();
+//	m_mapProInfo.insert(m_mapProCache.begin(), m_mapProCache.end());
+//
+//}
 
+BOOL KBkwinDemoDlg::AddListItemChilds(SetProcessInfo & data, KCreateXmlElementFunc& XmlElFunc)
+{
+    KTinyXml tinyXml;
+    CString strPos;
+    int nLeft, nRight;
+    std::vector<CString> vecData;
+    LoadRowData(data, vecData);
+    int nColWidth = LIST_ITEM_WIDTH / (m_SelectSum + 2);
+
+    for(int i = 0; i < m_SelectSum; ++i)
+    {
+        int nIndex = i > 1?(i+2):i;
+        nLeft = nIndex * nColWidth;
+        nRight = i == 1?4*nColWidth:nColWidth + nLeft;
+        strPos.Format(L"%d,0,%d,-0", nLeft, nRight);
+        XmlElFunc.AddTinySibling("text", IDC_LIST_KEY + i, CT2A(strPos), NULL, NULL, i > 1?"text_center":"text_left");
+        XmlElFunc().Write("crtext", "999999");
+        XmlElFunc().WriteText(vecData[i]);
+        /*if(!m_bRefreshHeader)
+        {
+            RefreshListHeader(tinyXml, nLeft, nRight, m_vecHeaderData[i]);
+        }*/
+    }
+
+    /*if(!m_bRefreshHeader)
+    {
+        CStringA strXml = tinyXml.ToXml();
+        CBkPanel* pPanel = static_cast<CBkPanel*>(GetBkItem(IDC_DLG_HEADER));
+        if(pPanel != NULL)
+        {
+            pPanel->LoadChilds(tinyXml.GetElement());
+            SetItemNeedReDraw(IDC_DLG_HEADER);
+        }
+
+        m_bRefreshHeader = TRUE;
+    }*/
+
+    return TRUE;
+}
+
+void KBkwinDemoDlg::LoadRowData(SetProcessInfo & processData, std::vector<CString>& vecRowData)
+{
+    CString strData;
+
+    vecRowData.push_back(processData.strProcessName);
+    vecRowData.push_back(processData.strProcessFullPath);
+    strData.Format(L"%d", processData.dwProcessID);
+    vecRowData.push_back(strData);
+    strData.Format(L"%d", processData.dwCpuUsage);
+    vecRowData.push_back(strData);
+    vecRowData.push_back(processData.strMemoryUser);
+
+    if(m_flagSet & FlagProcessUser)
+    {
+        vecRowData.push_back(processData.strUserName);
+    }
+    if(m_flagSet & FlagProcessParent)
+    {
+        strData.Format(L"%d", processData.dwParentPID);
+        vecRowData.push_back(strData);
+    }
+    if(m_flagSet & FlagProcessHandle)
+    {
+        strData.Format(L"%d", processData.dwHandleCount);
+        vecRowData.push_back(strData);
+    }
+    if(m_flagSet & FlagProcessThread)
+    {
+        strData.Format(L"%d", processData.dwThreadCount);
+        vecRowData.push_back(strData);
+    }
+    if(m_flagSet & FlagProcessSession)
+    {
+        strData.Format(L"%d", processData.dwSessionID);
+        vecRowData.push_back(strData);
+    }
+}
+
+void KBkwinDemoDlg::LoadHeaderData(std::vector<CString>& vecHeaderData)
+{
+
+    vecHeaderData.push_back(L"进程名称");
+    vecHeaderData.push_back(L"进程全路径");
+    vecHeaderData.push_back(L"进程ID");
+    vecHeaderData.push_back(L"CPU占用");
+    vecHeaderData.push_back(L"内存占用");
+
+    if(m_flagSet & FlagProcessUser)
+    {
+        vecHeaderData.push_back(L"用户名");
+    }
+    if(m_flagSet & FlagProcessParent)
+    {
+        vecHeaderData.push_back(L"父进程PID");
+    }
+    if(m_flagSet & FlagProcessHandle)
+    {
+        vecHeaderData.push_back(L"句柄数");
+    }
+    if(m_flagSet & FlagProcessThread)
+    {
+        vecHeaderData.push_back(L"线程数");
+    }
+    if(m_flagSet & FlagProcessSession)
+    {
+        vecHeaderData.push_back(L"会话ID");
+    }
+}
+
+void KBkwinDemoDlg::CreateListHeader()
+{
+    CStringA strHeaderXml;
+    int nColWidth = LIST_ITEM_WIDTH / (m_SelectSum + 2);
+    TiXmlDocument* pXmlDoc = new TiXmlDocument;
+
+    strHeaderXml.Append("<dlg>\r\n");
+    
+    std::vector<CString>::iterator iter = m_vecHeaderData.begin();
+    int iDex = 0;
+    for(iter; iter != m_vecHeaderData.end(); ++iter, ++iDex)
+    {
+        CStringA strItem;
+        int nIndex = iDex > 1?(iDex+2):iDex;
+        int nLeft = nIndex * nColWidth;
+        int nRight = iDex == 1?4*nColWidth:nColWidth + nLeft;
+        strItem.Format("<text pos=\"%d,0,%d,-0\"  show=\"1\" class=\"text_center\">%s</text>\r\n", nLeft, nRight, CT2A(*iter));
+        strHeaderXml.Append(strItem);
+    }
+
+     strHeaderXml.Append("</dlg>\r\n");
+
+    m_pTitleDlg = (CBkDialog*)FindChildByCmdID(IDC_DLG_HEADER);
+
+    pXmlDoc->Parse(strHeaderXml, NULL, TIXML_ENCODING_UTF8);
+    m_pTitleDlg->AppendChildEx(pXmlDoc->RootElement(), TRUE);
+    m_pTitleDlg->NotifyInvalidate();
 }
 
 void KBkwinDemoDlg::OnListItemLButtonUp( int nListItem )
@@ -250,33 +446,29 @@ void KBkwinDemoDlg::OnListItemMouseLeave( int nListItem )
 
 void KBkwinDemoDlg::UpdateWindowsUI()
 {
+    
 	if(m_mapProInfo.empty())
 	{
 		return;
 	}
 	//DeleteAllListItem(IDC_LIST_PROC);
 
-	UpdateConfig();
+	
 	// AddTableTitleToListWnd();  	//  第一列的行头 添加
+    CreateListHeader();
 
 	// TODO 第一列的行头在 这里添加
-	//AddOnekeyToListWnd( SetProcessInfo() , 0);
-
 	int nIndex = 0;
 	for (map<DWORD, SetProcessInfo>::iterator it= m_mapProInfo.begin();
 		it != m_mapProInfo.end(); ++it)
 	{
-		SetProcessInfo info = it->second;
-		AddOnekeyToListWnd(info, nIndex++);
+		AddListItem(it->second, nIndex++);
 	}
-    //map<DWORD, SetProcessInfo>::iterator it= m_mapProInfo.begin();
-    //AddOnekeyToListWnd((*it).second, nIndex++);
-
 
 	UpdateLayoutList(IDC_LIST_PROC);
 }
 
-BOOL KBkwinDemoDlg::AddOnekeyToListWnd( SetProcessInfo & data , int nIndex)
+BOOL KBkwinDemoDlg::AddListItem( SetProcessInfo & data , int nIndex)
 {
 	BOOL bReturn = FALSE;
 	KTinyXml tinyXml;
@@ -291,7 +483,7 @@ BOOL KBkwinDemoDlg::AddOnekeyToListWnd( SetProcessInfo & data , int nIndex)
 		}
 
 		KTinyXmlRememberPos(tinyXml);
-		bRetCode = CreateHotkeyListItemXml(data, tinyXml, nIndex);
+		bRetCode = CreateListItemXml(data, tinyXml, nIndex);
 
 		if (!bRetCode || !tinyXml.FirstChild())
 		{
@@ -309,16 +501,9 @@ Exit0:
 	return bReturn;
 }
 
-BOOL KBkwinDemoDlg::CreateHotkeyListItemXml(SetProcessInfo & data, KTinyXml tinyXml, int nIndex )
+BOOL KBkwinDemoDlg::CreateListItemXml(SetProcessInfo & data, KTinyXml tinyXml, int nIndex )
 {
-	int nwidth = m_nItemWidth ; //可变, 根据选了多少个长度
-	CString pos;
-	int posFirstLeft;
-	int posFirstRight;
-	CString str;
-
 	BOOL bReturn = FALSE;
-	CStringA StrPos;
 	KCreateXmlElementFunc XmlElFunc(tinyXml);
 
 	bReturn = XmlElFunc.AddTinyChild("listitem", 100 + nIndex, NULL, NULL, NULL, NULL, "1");
@@ -331,24 +516,10 @@ BOOL KBkwinDemoDlg::CreateHotkeyListItemXml(SetProcessInfo & data, KTinyXml tiny
 	bReturn = XmlElFunc().Write("class", "listitem_class");
 	if (FALSE == bReturn) goto Exit0;
 
-	posFirstLeft = 0;
-	posFirstRight = posFirstLeft + nwidth;
-	pos.AppendFormat(L"%d,0,%d,-0", posFirstLeft, posFirstRight);
-	bReturn = XmlElFunc.AddTinySibling("text", IDC_LIST_KEY, CT2A(pos), NULL, NULL, "text_center");
-	if (FALSE == bReturn) return bReturn;
-	XmlElFunc().Write("crtext", "999999");
-	XmlElFunc().WriteText(data.strProcessName);
+	bReturn = XmlElFunc.AddTinyChild("dlg", NULL,  "0,0,-0,-0", NULL, NULL, NULL, "1");
+	if (FALSE == bReturn) goto Exit0;
 
-	pos.Empty();
-	posFirstLeft = posFirstRight;
-	posFirstRight = posFirstLeft + nwidth;
-	pos.AppendFormat(L"%d,0,%d,-0", posFirstLeft, posFirstRight);
-	bReturn = XmlElFunc.AddTinySibling("text", IDC_LIST_KEY, CT2A(pos), NULL, NULL, "text_center");
-	if (FALSE == bReturn) return bReturn;
-	XmlElFunc().Write("crtext", "999999");
-	str.Empty();
-	str.AppendFormat(L"%d", data.dwParentPID);
-	XmlElFunc().WriteText(str);
+    AddListItemChilds(data, XmlElFunc);
 
 Exit0:
 	return bReturn;
@@ -366,7 +537,7 @@ void KBkwinDemoDlg::UpdateConfig()
 {
 	m_flagSet = ConfigUtilInst.GetFlagSet();
 	m_SelectSum = ConfigUtilInst.GetSelectSum();
-	m_nItemWidth = ITEM_WIDTH * (ALL_ITEM_NUM / m_SelectSum); 
+	//m_nItemWidth = ITEM_WIDTH * (ALL_ITEM_NUM / m_SelectSum); 
 }
 
 BOOL KBkwinDemoDlg::AddTableTitleToListWnd()
