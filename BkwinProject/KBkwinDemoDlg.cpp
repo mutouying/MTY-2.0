@@ -10,6 +10,9 @@
 KBkwinDemoDlg::KBkwinDemoDlg()
     : CBkDialogViewImplEx<KBkwinDemoDlg>(IDR_MAIN)
 {
+    RegisterIpcServer();
+    LoadMule();
+    m_evtFirsetLoadEnd.Create(NULL, TRUE, FALSE);
 	m_pMenu = NULL;
 }
 
@@ -31,9 +34,19 @@ BOOL KBkwinDemoDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
 	//testCode();
 	//UpdateWindowsUI();
-    RegisterIpcServer();
+    PostMessage(WM_DELAY_LOADDATA);
     LoadMule();
     return TRUE;
+}
+
+LRESULT KBkwinDemoDlg::OnDelayInit(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    if(m_evtFirsetLoadEnd.Wait(INFINITE))
+    {
+        UpdateWindowsUI();
+    }
+
+    return 0;
 }
 
 void KBkwinDemoDlg::OnSysCommand(UINT nID, CPoint point)
@@ -84,11 +97,11 @@ BOOL KBkwinDemoDlg::LoadMule()
         return FALSE;
     }
 
-    IBaseProcessMgr* pBootPop = (IBaseProcessMgr*)fn(&__uuidof(IBaseProcessMgr));
-    if(pBootPop == NULL)
+    IBaseProcessMgr* pProcessMgr = (IBaseProcessMgr*)fn(&__uuidof(IBaseProcessMgr));
+    if(pProcessMgr == NULL)
         return FALSE;
 
-    pBootPop->Init();
+    pProcessMgr->Init();
 }
 
 void KBkwinDemoDlg::RegisterIpcServer()
@@ -145,7 +158,8 @@ int KBkwinDemoDlg::FirstLoadProcess(easyipc::IEasyIpcBundle* pParam, easyipc::IE
 int KBkwinDemoDlg::FirstLoadEnd(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*)
 {
     UpdateCacheMapToRealMap();
-    UpdateWindowsUI();
+    m_evtFirsetLoadEnd.SetEvent();
+    //UpdateWindowsUI();
 
     return 0;
 }
@@ -228,17 +242,17 @@ void KBkwinDemoDlg::UpdateWindowsUI()
 	//AddOnekeyToListWnd( SetProcessInfo() , 0);
 
 	int nIndex = 0;
-	/*for (map<DWORD, SetProcessInfo>::iterator it= m_mapProInfo.begin();
+	for (map<DWORD, SetProcessInfo>::iterator it= m_mapProInfo.begin();
 		it != m_mapProInfo.end(); ++it)
 	{
 		SetProcessInfo info = it->second;
 		AddOnekeyToListWnd(info, nIndex++);
-	}*/
-    map<DWORD, SetProcessInfo>::iterator it= m_mapProInfo.begin();
-    AddOnekeyToListWnd((*it).second, nIndex++);
-	UpdateLayoutList(IDC_LIST_PROC);
+	}
+    //map<DWORD, SetProcessInfo>::iterator it= m_mapProInfo.begin();
+    //AddOnekeyToListWnd((*it).second, nIndex++);
 
-	SendMessage(WM_PAINT);
+
+	UpdateLayoutList(IDC_LIST_PROC);
 }
 
 BOOL KBkwinDemoDlg::AddOnekeyToListWnd( SetProcessInfo & data , int nIndex)
@@ -289,7 +303,7 @@ BOOL KBkwinDemoDlg::CreateHotkeyListItemXml(SetProcessInfo & data, KTinyXml tiny
 	CStringA StrPos;
 	KCreateXmlElementFunc XmlElFunc(tinyXml);
 
-	bReturn = XmlElFunc.AddTinyChild("listitem", 0, NULL, NULL, NULL, NULL, "1");
+	bReturn = XmlElFunc.AddTinyChild("listitem", 100 + nIndex, NULL, NULL, NULL, NULL, "1");
 	if (FALSE == bReturn) goto Exit0;
 
 

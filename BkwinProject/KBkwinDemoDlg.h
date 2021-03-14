@@ -10,6 +10,9 @@
 #include "EasyIpc/easyipcserverwrap.h"
 #include "framework/KLocker.h"
 #include "ProcessMgr/IBaseProcessMgr.h"
+#include "framework/KEvent.h"
+
+#define WM_DELAY_LOADDATA  WM_USER + 100
 
 using namespace std;
 class KBkwinDemoDlg
@@ -48,12 +51,15 @@ protected:
         MSG_BK_NOTIFY(IDC_RICHVIEW_WIN_EX)
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_SYSCOMMAND(OnSysCommand)
+
+        MESSAGE_HANDLER_EX(WM_DELAY_LOADDATA, OnDelayInit)
 	
 		CHAIN_MSG_MAP(CBkDialogViewImplEx<KBkwinDemoDlg>)
         REFLECT_NOTIFICATIONS_EX()
     END_MSG_MAP()
 
     BOOL OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/);
+    LRESULT OnDelayInit(UINT uMsg, WPARAM wParam, LPARAM lParam);
     void OnBtnClose();
     void OnSysCommand(UINT nID, CPoint point);
 	void OnSetting();
@@ -91,4 +97,5 @@ private:
     CString m_strIpcName1;
     CString m_strIpcName2;
     CString m_strIpcName3;
+    KEvent m_evtFirsetLoadEnd;
 };
