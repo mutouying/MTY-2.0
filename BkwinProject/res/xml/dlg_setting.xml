@@ -2,7 +2,7 @@
     <header crbg="f1c800" width="full" height="50">
       <img pos="6,8" skin="logo"/>
       <text class="text_title" pos="25,10">进程管理器设置</text>
-	  <imgbtn id="200" pos="-40,0" skin="dlg_btn_close"/>
+	  <imgbtn id="200" pos="-30,0" skin="dlg_btn_close" class="linkimage"/>
 	</header>
 	
 	<body crbg="fbfbfb" width="full" height="full" >
@@ -13,11 +13,11 @@
     <check id="104" pos="20,70">CPU占用</check>
     <check id="105" pos="20,90">内存占用</check>
 
-    <check id="106" pos="|5,10">用户名</check>
-    <check id="107" pos="|5,30">父进程PID</check>
-    <check id="108" pos="|5,50">句柄数</check>
-    <check id="109" pos="|5,70">线程数</check>
-    <check id="110" pos="|5,90">会话ID</check>
+    <check id="106" class="linkimage"  pos="|5,10">用户名</check>
+    <check id="107"  class="linkimage" pos="|5,30">父进程PID</check>
+    <check id="108" class="linkimage"  pos="|5,50">句柄数</check>
+    <check id="109"  class="linkimage" pos="|5,70">线程数</check>
+    <check id="110" class="linkimage" pos="|5,90">会话ID</check>
 
     <dlg pos="0,-30,-0,-0"  >
       <!--<text  id="40007" pos="15,10" crtext="649AF0" class="linkimage"  font="0002">恢复默认</text>-->

@@ -5,13 +5,18 @@
 #include "framework/KTinyXml.h"
 #include "framework/KCreateXmlElementFunc.h"
 #include "ConfigUtil.h"
+#include <fstream>
+#include <string>
 
+
+#define  PROCESSINFO_LEN    512
 #define  ITEM_HEIGHT 20
 #define  ITEM_WIDTH  100
 
 KBkwinDemoDlg::KBkwinDemoDlg()
     : CBkDialogViewImplEx<KBkwinDemoDlg>(IDR_MAIN)
 {
+	BkWin::WndShadowHelper<KBkwinDemoDlg>::SetShadowData(12, IDP_SHADOW);
     RegisterIpcServer();
     LoadMule();
     m_evtFirsetLoadEnd.Create(NULL, TRUE, FALSE);
@@ -19,6 +24,12 @@ KBkwinDemoDlg::KBkwinDemoDlg()
 	m_nItemWidth = ITEM_WIDTH;
 	m_flagSet = 0;
 	m_SelectSum =0;
+
+	m_nPid = 0;
+	m_evtKillProcess.Create(NULL, TRUE, FALSE);
+	m_evtOutputAllProcess.Create(NULL, TRUE, FALSE);
+	m_evtOpenFilePos.Create(NULL, TRUE, FALSE);
+	m_evtOpenFilePos.Create(NULL, TRUE, FALSE);
 }
 
 KBkwinDemoDlg::~KBkwinDemoDlg()
@@ -90,7 +101,14 @@ BOOL KBkwinDemoDlg::LoadMule()
 
     typedef IUnknown* (__stdcall *CreateObj_fun)(const IID * iid);
 
-    hModule = ::LoadLibraryW(L"E:\\WorkSpace\\MTY-2.0-GitTest\\bin\\ProcessMgrDll.dll");
+	TCHAR pathm[MAX_PATH];
+	GetModuleFileName(NULL, pathm, MAX_PATH);
+	CString strModule = pathm;
+	int pos = strModule.ReverseFind(L'\\');
+	CString strPath = strModule.Left(pos);
+	strPath.AppendFormat(L"\\ProcessMgrDll.dll");
+
+    hModule = ::LoadLibraryW(strPath);
     if (NULL == hModule)
     {
         return FALSE;
@@ -435,3 +453,121 @@ BOOL KBkwinDemoDlg::AddTableTitleToListWnd()
 // 	return bReturn;
 // }
 
+void KBkwinDemoDlg::OnActivate(KActor* pActor)
+{
+	if(pActor == &m_atorLogic)
+	{
+		StartProLogic();
+	}
+}
+
+
+void KBkwinDemoDlg::StartProLogic()
+{
+	while(TRUE)
+	{
+		int object = m_evtOutputAllProcess.WaitThreeEvent(m_evtOpenFilePos, m_evtOpenFileAtt, FALSE, 100);
+		switch (object)
+		{
+		case KEvent::WAIT_RESULT_OBJECT_0:
+			// 导出所有文件
+			break;
+		case KEvent::WAIT_RESULT_OBJECT_1:
+			// 打开文件位置
+			break;
+		case KEvent::WAIT_RESULT_OBJECT_2:
+			// 定位文件属性
+			break;
+		case KEvent::WAIT_RESULT_TIME_OUT:
+		default:
+			break;
+		}
+		::Sleep(100);
+	}
+}
+
+int KBkwinDemoDlg::OnBtnKillProcess()
+{
+	OutputAllProcess();
+	map<DWORD, SetProcessInfo>::iterator iter;
+	iter = m_mapProInfo.find(m_nPid);
+	if (iter!= m_mapProInfo.end())
+	{
+		KillProcessById(m_nPid);
+		m_mapProInfo.erase(iter);
+		UpdateWindowsUI();
+	}
+	return 1;
+}
+
+int   KBkwinDemoDlg::KillProcessById(int pid)
+{
+	int id = 0;
+	id = pid;
+	HANDLE hProcess=NULL;
+	hProcess=OpenProcess(PROCESS_TERMINATE,FALSE,id);	//打开目标进程
+	if (hProcess==NULL) {
+		wprintf(L"\nOpen Process fAiled:%d\n",GetLastError());
+		return -1;
+	}
+	DWORD ret=TerminateProcess(hProcess,0);	//结束目标进程
+	if(ret==0) {
+		wprintf(L"%d",GetLastError());
+		return -1;
+	}
+	return 1;
+}
+
+int   KBkwinDemoDlg::OutputAllProcess()
+{
+	ofstream output;
+	CString file_name = L"processinfo.txt"; 
+	output.open(file_name, std::ofstream::binary);
+	for (map<DWORD, SetProcessInfo>::iterator iter = m_mapProInfo.begin(); iter!=m_mapProInfo.end(); ++iter )
+	{
+		SetProcessInfo n = iter->second;
+		
+		char szBuf[PROCESSINFO_LEN] = { 0 };
+		sprintf_s(szBuf, PROCESSINFO_LEN, "%s: %s\n", "strProcessNane", CT2A(n.strProcessName,CP_UTF8));
+		output.write(szBuf, strlen(szBuf));
+
+		memset(szBuf, 0,PROCESSINFO_LEN );
+		sprintf_s(szBuf, PROCESSINFO_LEN, "%s %s\n", "strProcessFullPath", CT2A(n.strProcessFullPath,CP_UTF8));
+		output.write(szBuf, strlen(szBuf));
+
+		memset(szBuf, 0,PROCESSINFO_LEN );
+		sprintf_s(szBuf, PROCESSINFO_LEN, "%s %d\n", "dwProcessID", n.dwParentPID);
+		output.write(szBuf, strlen(szBuf));
+
+		memset(szBuf, 0,PROCESSINFO_LEN );
+		sprintf_s(szBuf, PROCESSINFO_LEN, "%s %d\n", "dwCpuUsage", n.dwCpuUsage);
+		output.write(szBuf, strlen(szBuf));
+
+		memset(szBuf, 0,PROCESSINFO_LEN );
+		sprintf_s(szBuf, PROCESSINFO_LEN, "%s %s\n", "strMemoryUser", CT2A(n.strMemoryUser,CP_UTF8));
+		output.write(szBuf, strlen(szBuf));
+
+		memset(szBuf, 0,PROCESSINFO_LEN );
+		sprintf_s(szBuf, PROCESSINFO_LEN, "%s %s\n", "strUserName", CT2A(n.strUserName,CP_UTF8));
+		output.write(szBuf, strlen(szBuf));
+
+		memset(szBuf, 0,PROCESSINFO_LEN );
+		sprintf_s(szBuf, PROCESSINFO_LEN, "%s %d\n", "dwParentPID", n.dwParentPID);
+		output.write(szBuf, strlen(szBuf));
+
+		memset(szBuf, 0,PROCESSINFO_LEN );
+		sprintf_s(szBuf, PROCESSINFO_LEN, "%s %d\n", "dwHandleCount", n.dwHandleCount);
+		output.write(szBuf, strlen(szBuf));
+
+		memset(szBuf, 0,PROCESSINFO_LEN );
+		sprintf_s(szBuf, PROCESSINFO_LEN, "%s %d\n", "dwThreadCount", n.dwThreadCount);
+		output.write(szBuf, strlen(szBuf));
+
+		memset(szBuf, 0,PROCESSINFO_LEN );
+		sprintf_s(szBuf, PROCESSINFO_LEN, "%s %d\n", "dwThreadCount", n.dwThreadCount);
+		output.write(szBuf, strlen(szBuf));
+
+	}
+	output.close();
+	return 0;
+}

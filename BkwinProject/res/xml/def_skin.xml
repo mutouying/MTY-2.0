@@ -15,12 +15,12 @@
   <png name="btn_small_sub" src="3007" subwidth="18"/>-->
 
  
-  <png name="dlg_btn_min" src="60112" subwidth="32"/>
-  <png name="dlg_btn_close" src="60115" subwidth="32"/>
+  <png name="dlg_btn_min" src="60112" subwidth="20"/>
+  <png name="dlg_btn_close" src="60115" subwidth="20"/>
   <png name="dlg_btn_fullwnd" src="60116" subwidth="31"/>
   <png name="logo" src="60117"/>
   <png name="logo_big" src="60118"/>
-  <png name="menu_setting" src="60119" />
+  <png name="menu_setting" src="60119"   subwidth="20"/>
   <png name="dlg_btn_over" src="60120" />
 
 </skins>
