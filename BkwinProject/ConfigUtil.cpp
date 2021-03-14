@@ -4,6 +4,9 @@
 
 ConfigUtil::ConfigUtil(void)
 {
+	m_flagSet = 0;
+	m_SelectSum =0;
+	LoadConfig();
 }
 
 ConfigUtil::~ConfigUtil(void)
@@ -16,7 +19,7 @@ BOOL ConfigUtil::Read(LPCTSTR szValueName, DWORD& dwValue)
 	DWORD Temp;
 	KRegister2 regKey;
 
-	if (FALSE == regKey.Open32(HKEY_CURRENT_USER, _T("software\\kingsoft\\bkwinProject")))
+	if (FALSE == regKey.Open32(HKEY_CURRENT_USER, _T("software\\kingsoft\\bkwinProject"), FALSE))
 		goto Exit0;
 
 	if (FALSE == regKey.Read(szValueName, Temp))
@@ -35,7 +38,7 @@ BOOL ConfigUtil::Read(LPCTSTR szValueName, CString& strValue)
 	CString strTemp;
 	KRegister2 regKey;
 
-	if (FALSE == regKey.Open32(HKEY_CURRENT_USER, _T("software\\kingsoft\\bkwinProject")))
+	if (FALSE == regKey.Open32(HKEY_CURRENT_USER, _T("software\\kingsoft\\bkwinProject"), FALSE))
 		goto Exit0;
 
 	if (FALSE == regKey.Read(szValueName, strTemp))
@@ -51,7 +54,7 @@ Exit0:
 BOOL ConfigUtil::Write(LPCTSTR szValueName, DWORD dwValue)
 {
 	KRegister2 regKey;
-	if (FALSE == regKey.Open32(HKEY_CURRENT_USER, _T("software\\kingsoft\\bkwinProject")))
+	if (FALSE == regKey.Open32(HKEY_CURRENT_USER, _T("software\\kingsoft\\bkwinProject"), FALSE))
 		goto Exit0;
 
 	if (FALSE == regKey.Write(szValueName, dwValue))
@@ -65,7 +68,7 @@ Exit0:
 BOOL ConfigUtil::Write(LPCTSTR szValueName, LPCTSTR szValue)
 {
 	KRegister2 regKey;
-	if (FALSE == regKey.Open32(HKEY_CURRENT_USER, _T("software\\kingsoft\\bkwinProject")))
+	if (FALSE == regKey.Open32(HKEY_CURRENT_USER, _T("software\\kingsoft\\bkwinProject"), FALSE))
 		goto Exit0;
 
 	if (FALSE == regKey.Write(szValueName, szValue))
@@ -74,4 +77,14 @@ BOOL ConfigUtil::Write(LPCTSTR szValueName, LPCTSTR szValue)
 
 Exit0:
 	return FALSE;
+}
+
+
+
+BOOL ConfigUtil::LoadConfig()
+{
+	BOOL ret;
+	ret = Read(KEY_FLAG_SET, (DWORD&) m_flagSet);
+	ret = Read(KEY_SELECT_SUM,(DWORD&) m_SelectSum);
+	return ret;
 }
