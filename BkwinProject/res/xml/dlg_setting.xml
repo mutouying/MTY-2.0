@@ -19,14 +19,14 @@
     <check id="109"  class="linkimage" pos="|5,70">线程数</check>
     <check id="110" class="linkimage" pos="|5,90">会话ID</check>
 
-    <dlg pos="0,-30,-0,-0"  >
+    <dlg pos="0,-35,-0,-5"  >
       <!--<text  id="40007" pos="15,10" crtext="649AF0" class="linkimage"  font="0002">恢复默认</text>-->
-      <dlgbtn id="201" crbg="f1c800" pos="-120,3,-70,28" class="linkimage" >
-        <text pos="12,0,-12,-0"  class="linkimage">确定</text>
+      <dlgbtn id="201"  pos="|0,0,|84,28" class="positive_btn" >
+        <text pos="0,0,-0,-3" class="text_center" >确定</text>
       </dlgbtn>
 
-      <dlgbtn id="202"  crbg="f1c800" pos="-65,3,-15,28" class="linkimage" >
-        <text pos="12,0,-12,-0" class="linkimage">取消</text>
+      <dlgbtn id="202" pos="-94,0,-10,28" class="negative_btn" >
+        <text pos="0,0,-0,-3">取消</text>
       </dlgbtn>
 
     </dlg>

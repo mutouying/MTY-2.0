@@ -23,5 +23,6 @@
   <class name="text_title" font="0004" crtext="ffffff"/>
   <class name="listitem_class" crbghover="cdcdcd"/>
   <class name="text_center" textmode="25" textmodeex="25"  crtext="000000" />
-  
+  <class name="positive_btn" skin="dlg_btn_pos" cursor="hand"/>
+  <class name="negative_btn" skin="dlg_btn_nag" cursor="hand"/>
 </style>

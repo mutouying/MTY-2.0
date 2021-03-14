@@ -22,5 +22,7 @@
   <png name="logo_big" src="60118"/>
   <png name="menu_setting" src="60119"   subwidth="20"/>
   <png name="dlg_btn_over" src="60120" />
+  <png name="dlg_btn_pos" src="60121" subwidth="84"/>
+  <png name="dlg_btn_nag" src="60122" subwidth="84"/>
 
 </skins>

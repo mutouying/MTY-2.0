@@ -32,7 +32,6 @@ KBkwinDemoDlg::KBkwinDemoDlg()
 	m_evtOpenFilePos.Create(NULL, TRUE, FALSE);
 	m_evtOpenFilePos.Create(NULL, TRUE, FALSE);
 
-    BkWin::WndShadowHelper<KBkwinDemoDlg>::SetShadowData(12, IDP_SHADOW);
 }
 
 KBkwinDemoDlg::~KBkwinDemoDlg()
@@ -58,6 +57,23 @@ KBkwinDemoDlg::~KBkwinDemoDlg()
         FreeLibrary(m_hModule);
         m_hModule = NULL;
     }
+
+	if(m_evtKillProcess.GetHandle())
+	{
+		m_evtKillProcess.Close();
+	}
+	if(m_evtOutputAllProcess.GetHandle())
+	{
+		m_evtOutputAllProcess.Close();
+	}
+	if(m_evtOpenFilePos.GetHandle())
+	{
+		m_evtOpenFilePos.Close();
+	}
+	if(m_evtOpenFilePos.GetHandle())
+	{
+		m_evtOpenFilePos.Close();
+	}
 }
 
 BOOL KBkwinDemoDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
@@ -70,7 +86,7 @@ BOOL KBkwinDemoDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
     RegisterIpcServer();
     PostMessage(WM_DELAY_LOADDATA);
     LoadModule();
-
+	m_atorLogic.Startup("m_atorLogic", this, false);
     return TRUE;
 }
 
@@ -455,23 +471,32 @@ void KBkwinDemoDlg::OnProcessExit(DWORD dwProcessId)
 
 void KBkwinDemoDlg::OnListItemLButtonUp( int nListItem )
 {
-
-// 	CString strKey;
-// 	strKey = GetListItemChildCtrlText(IDC_WND_HOT, nListItem, IDC_WND_HOTKEY);
-// 	
+// 	CString pid = GetListItemChildCtrlText(IDC_LIST_PROC, nListItem, IDC_LIST_KEY + 3);
+// 	CString str;
+	//str.Format(L"%d", pid);
+	//::MessageBox(NULL,pid,pid, MB_OK);
 
 }
+
+void KBkwinDemoDlg::OnListItemRButtonUp( int nListItem )
+{
+
+// 	CString pid = GetListItemChildCtrlText(IDC_LIST_PROC, nListItem, IDC_LIST_KEY);
+// 	CString str;
+	//str.Format(L"%d", pid);
+	//::MessageBox(NULL,pid,pid, MB_OK);
+
+}
+
 
 void KBkwinDemoDlg::OnListItemMouseHover( int nListItem )
 {
 
-	// SetListItemChildCtrlAttribute(IDC_LIST_PROC, nListItem, IDC_LIST_KEY, "crtext", "333333");
 }
 
 void KBkwinDemoDlg::OnListItemMouseLeave( int nListItem )
 {
 
-	// SetListItemChildCtrlAttribute(IDC_LIST_PROC, nListItem, IDC_LIST_KEY, "crtext", "999999");
 }
 
 void KBkwinDemoDlg::UpdateWindowsUI()
@@ -585,37 +610,53 @@ void KBkwinDemoDlg::StartProLogic()
 {
 	while(TRUE)
 	{
-		int object = m_evtOutputAllProcess.WaitThreeEvent(m_evtOpenFilePos, m_evtOpenFileAtt, FALSE, 100);
-		switch (object)
+// 		int object = m_evtOutputAllProcess.WaitThreeEvent(m_evtOpenFilePos, m_evtOpenFileAtt, FALSE, 1000);
+// 		switch (object)
+// 		{
+// 		case KEvent::WAIT_RESULT_OBJECT_0:
+// 			OutputAllProcess();
+// 			m_evtOutputAllProcess.Reset();
+// 			// 导出所有文件
+// 			break;
+// 		case KEvent::WAIT_RESULT_OBJECT_1:
+// 			OutputAllProcess();
+// 			// 打开文件位置
+// 			break;
+// 		case KEvent::WAIT_RESULT_OBJECT_2:
+// 			OutputAllProcess();
+// 			// 定位文件属性
+// 			break;
+// 		case KEvent::WAIT_RESULT_TIME_OUT:
+// 		default:
+// 			break;
+// 		}
+
+		if (m_evtOutputAllProcess.Wait(1000))
 		{
-		case KEvent::WAIT_RESULT_OBJECT_0:
-			// 导出所有文件
-			break;
-		case KEvent::WAIT_RESULT_OBJECT_1:
-			// 打开文件位置
-			break;
-		case KEvent::WAIT_RESULT_OBJECT_2:
-			// 定位文件属性
-			break;
-		case KEvent::WAIT_RESULT_TIME_OUT:
-		default:
-			break;
+			OutputAllProcess();
+			m_evtOutputAllProcess.Reset();
 		}
-		::Sleep(100);
 	}
 }
 
 int KBkwinDemoDlg::OnBtnKillProcess()
 {
-	OutputAllProcess();
-	map<DWORD, SetProcessInfo>::iterator iter;
-	iter = m_mapProInfo.find(m_nPid);
-	if (iter!= m_mapProInfo.end())
-	{
-		KillProcessById(m_nPid);
-		m_mapProInfo.erase(iter);
-		UpdateWindowsUI();
-	}
+
+ 	map<DWORD, SetProcessInfo>::iterator iter;
+ 	iter = m_mapProInfo.find(m_nPid);
+ 	if (iter!= m_mapProInfo.end())
+ 	{
+ 		KillProcessById(m_nPid);
+ 		m_mapProInfo.erase(iter);
+ 		UpdateWindowsUI();
+ 	}
+	return 1;
+}
+
+
+int KBkwinDemoDlg::OnBtnOutputAllProcess()
+{
+	m_evtOutputAllProcess.SetEvent();
 	return 1;
 }
 
@@ -683,8 +724,10 @@ int   KBkwinDemoDlg::OutputAllProcess()
 		output.write(szBuf, strlen(szBuf));
 
 		memset(szBuf, 0,PROCESSINFO_LEN );
-		sprintf_s(szBuf, PROCESSINFO_LEN, "%s %d\n", "dwThreadCount", n.dwThreadCount);
+		sprintf_s(szBuf, PROCESSINFO_LEN, "%s %d\n\n", "dwThreadCount", n.dwThreadCount);
 		output.write(szBuf, strlen(szBuf));
+
+
 
 	}
 	output.close();
