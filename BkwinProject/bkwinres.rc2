@@ -40,4 +40,5 @@ DEFINE_PNG(IDP_PNG_60117,						60117,		"res\\png\\logo.png")
 DEFINE_PNG(IDP_PNG_60118,						60118,		"res\\png\\logo_big.png")
 DEFINE_PNG(IDP_PND_60119,			60119,		 "res\\png\\menu_setting.png")
 DEFINE_PNG(IDP_PND_60120,			60120,		 "res\\png\\dlg_btn_over.png")
-
+DEFINE_PNG(IDR_PNG_60121,					60121,	"res\\png\\dlg_btn_pos.png")
+DEFINE_PNG(IDR_PNG_60122,					60122,	"res\\png\\dlg_btn_nag.png")

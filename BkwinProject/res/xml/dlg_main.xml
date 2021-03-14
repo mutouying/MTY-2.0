@@ -1,27 +1,35 @@
 ﻿<layer title="BkwinProject" width="1000" height="570" appwin="1" resize="0" maximize="1" >
   <header crbg="f1c800" width="full" height="30">
     <img pos="6,8" skin="logo"/>
-    <imgbtn id="100" pos="-72,0" skin="dlg_btn_min"/>
+    <imgbtn id="100" pos="-72,4" skin="dlg_btn_min" class="linkimage" />
     <!--<imgbtn id="101" pos="-72,0,31,17" skin="dlg_btn_fullwnd"/>-->
-    <imgbtn id="102" pos="-40,0"  skin="dlg_btn_close"/>
+    <imgbtn id="102" pos="-40,4"  skin="dlg_btn_close" class="linkimage" />
     <text  class="text_title" pos="25,10">进程管理器</text>
     <imgbtn id="103" pos="-151,4"  class="linkimage"  skin="menu_setting"/>
-    <text id="103"  pos="-132,6"  crtext="FFFFFF">设置</text>
+    <text id="103"  pos="-130,8">设置</text>
   </header>
 
   <body crbg="fbfbfb" width="full" height="full" >
   
-    <dlg id="200" pos="0,0,-0,65"  crbg="f1c800">
+    <dlg id="200" pos="0,0,-0,65"  crbg="f3f3f3">
       <img pos="25,9" skin="logo_big" />
       <!--<text pos="93,17,183" font="0004" crtext="f1c800">正在运行进程:</text>^
       <text id="800" pos="184,17" font="0004" crtext="f1c800"></text>-->
      
-      <text pos="108,41">CPU占用:</text>
+      <!--<text pos="108,41">CPU占用:</text>
       <text id="201" pos="160,41"></text>
       <text pos="227,41">内存占用:</text>
-      <text id="202" pos="280,41"></text>
-      <imgbtn id="203"  pos="-129,22"  skin="dlg_btn_over" class="linkimage"  ></imgbtn>
-      
+      <text id="202" pos="280,41"></text>-->
+      <!--<imgbtn id="203"  pos="-129,22"  skin="dlg_btn_over" class="linkimage"  ></imgbtn>-->
+
+      <dlgbtn id="203"  pos="-134,20,-50,48" class="positive_btn" >
+        <text pos="0,0,-0,-3" class="text_center" >结束进程</text>
+      </dlgbtn>
+
+      <dlgbtn id="204"  pos="-234,20,-150,48" class="positive_btn" >
+        <text pos="0,0,-0,-3" class="text_center" >导出全部信息</text>
+      </dlgbtn>
+
     </dlg>
 
 
@@ -42,8 +50,9 @@
     
 
     <!-- 进程信息listwnd -->
-    <listwnd id="1000" pos="0,85,-0,-25" />
+    <listwnd id="1000" pos="10,85,-10,-25" />
 
-    
+    <dlg  pos="0,-30,-0,-0"  crbg="f3f3f3"/>
+      
   </body>
 </layer>

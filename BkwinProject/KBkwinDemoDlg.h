@@ -36,6 +36,8 @@ public:
 		IDC_BTN_SETTING							=	103,
 
 		IDC_BTN_KILL_PROCESS					=    203,
+		IDC_BTN_KILL_OUTPUT_INFO				=    204,
+
 
 		IDC_LIST_PROC							= 1000,
 		IDC_LIST_KEY							= 1001,
@@ -48,10 +50,12 @@ protected:
 		BK_NOTIFY_ID_COMMAND(IDC_BTN_CLOSE, OnBtnClose)
 		BK_NOTIFY_ID_COMMAND(IDC_BTN_SETTING,OnSetting)
 		BK_NOTIFY_ID_COMMAND(IDC_BTN_KILL_PROCESS,OnBtnKillProcess)
+		BK_NOTIFY_ID_COMMAND(IDC_BTN_KILL_PROCESS,OnBtnOutputAllProcess)
 
 		BK_LISTWND_NOTIFY_BEGIN(IDC_LIST_PROC)
 			BK_LISTWND_LISTITEM_MOUSEHOVER(OnListItemMouseHover)
 			BK_LISTWND_LISTITEM_LBUTTONUP(OnListItemLButtonUp)
+			BK_LISTWND_LISTITEM_RBUTTONDOWN(OnListItemRButtonUp)
 			BK_LISTWND_LISTITEM_CHILD_LBUTTONUP(OnListItemChildLBtnUp)
 		BK_LISTWND_NOTIFY_END()
     BK_NOTIFY_MAP_END()
@@ -76,9 +80,9 @@ protected:
 	void OnListItemMouseHover(int nListItem);
 	void OnListItemMouseLeave(int nListItem);
 	void OnListItemChildLBtnUp(int nListItem, int nChildCtrlId);
+	void OnListItemRButtonUp( int nListItem);
 
 	void UpdateConfig();
-	BOOL AddTableTitleToListWnd();
 	void UpdateWindowsUI();
 	BOOL AddListItem(SetProcessInfo& data);
 	BOOL CreateListItemXml(SetProcessInfo & data, KTinyXml tinyXml);
@@ -92,6 +96,7 @@ protected:
 	virtual void   OnActivate(KActor* pActor);
 	void StartProLogic();
 	int OutputAllProcess();
+	int OnBtnOutputAllProcess();
 protected:
 	virtual void OnBkMenuCmd(CBkDialogMenu*  pDialogMenu, LPCWSTR lpszMenuName);
 	void OnBtnMin();
