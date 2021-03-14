@@ -80,8 +80,8 @@ protected:
 	void UpdateConfig();
 	BOOL AddTableTitleToListWnd();
 	void UpdateWindowsUI();
-	BOOL AddListItem(SetProcessInfo& data , int nIndex);
-	BOOL CreateListItemXml(SetProcessInfo & data, KTinyXml tinyXml, int nIndex );
+	BOOL AddListItem(SetProcessInfo& data);
+	BOOL CreateListItemXml(SetProcessInfo & data, KTinyXml tinyXml);
 	void testCode();
 	//void UpdateCacheMapToRealMap();
 
@@ -110,9 +110,12 @@ private:
     void LoadHeaderData(std::vector<CString>& vecHeaderData);
 
     void CreateListHeader();
+    SetProcessInfo LoadDataFromIpc(easyipc::IEasyIpcBundle* pParam);
+
+    void OnProcessExit(DWORD dwProcessId);
 
 	map<DWORD, SetProcessInfo> m_mapProInfo;
-	map<DWORD, SetProcessInfo> m_mapProCache;
+	//map<DWORD, SetProcessInfo> m_mapProCache;
 private:
 	// RECT	m_oldRect;
 	//int		m_nItemWidth;
@@ -124,6 +127,8 @@ private:
     CString m_strIpcName2;
     CString m_strIpcName3;
     KEvent m_evtFirsetLoadEnd;
+
+    BOOL m_bFirstLoad;
 
 
     IBaseProcessMgr* m_pProcessMgr;

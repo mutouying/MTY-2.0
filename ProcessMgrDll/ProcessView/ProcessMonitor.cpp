@@ -64,10 +64,8 @@ void ProcessMonitor::StartMonitor()
         {
             break;
         }
-
-        BeginEnumProcess();
-
         ::Sleep(m_dwInterNal);
+        BeginEnumProcess();
     }
 }
 

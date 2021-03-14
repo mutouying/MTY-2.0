@@ -18,20 +18,21 @@ KBkwinDemoDlg::KBkwinDemoDlg()
     , m_SelectSum(0)
 {
     m_hModule = NULL;
-	BkWin::WndShadowHelper<KBkwinDemoDlg>::SetShadowData(12, IDP_SHADOW);
-    RegisterIpcServer();
-    LoadModule();
     m_evtFirsetLoadEnd.Create(NULL, TRUE, FALSE);
 	m_pMenu = NULL;
     m_pProcessMgr = NULL;
     m_bRefreshHeader = FALSE;
     m_pTitleDlg = NULL;
 
+    m_bFirstLoad = FALSE;
+
 	m_nPid = 0;
 	m_evtKillProcess.Create(NULL, TRUE, FALSE);
 	m_evtOutputAllProcess.Create(NULL, TRUE, FALSE);
 	m_evtOpenFilePos.Create(NULL, TRUE, FALSE);
 	m_evtOpenFilePos.Create(NULL, TRUE, FALSE);
+
+    BkWin::WndShadowHelper<KBkwinDemoDlg>::SetShadowData(12, IDP_SHADOW);
 }
 
 KBkwinDemoDlg::~KBkwinDemoDlg()
@@ -46,12 +47,12 @@ KBkwinDemoDlg::~KBkwinDemoDlg()
 	}
 
     UnRegisterIpcServer();
-    if(m_pProcessMgr)
+    /*if(m_pProcessMgr)
     {
         m_pProcessMgr->UnInit();
         m_pProcessMgr->Drop();
         m_pProcessMgr = NULL;
-    }
+    }*/
     if(m_hModule)
     {
         FreeLibrary(m_hModule);
@@ -63,6 +64,7 @@ BOOL KBkwinDemoDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
 	//testCode();
 	//UpdateWindowsUI();
+    CreateListHeader();
     UpdateConfig();
     LoadHeaderData(m_vecHeaderData);
     RegisterIpcServer();
@@ -78,6 +80,8 @@ LRESULT KBkwinDemoDlg::OnDelayInit(UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         UpdateWindowsUI();
     }
+
+    m_bFirstLoad = TRUE;
 
     return 0;
 }
@@ -173,31 +177,13 @@ void KBkwinDemoDlg::UnRegisterIpcServer()
 
 int KBkwinDemoDlg::FirstLoadProcess(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*)
 {
-    KLocker locker(m_csNewItemNotify);
-
-    SetProcessInfo newItem;
-
-    newItem.strProcessFullPath = pParam->GetString(L"strProcessFullPath", NULL);
-    newItem.strProcessName = pParam->GetString(L"strProcessName", NULL);
-    newItem.dwProcessID = pParam->GetInt(L"dwProcessID", 0);
-    newItem.dwCpuUsage = pParam->GetInt(L"dwCpuUsage", 0);
-    newItem.strMemoryUser = pParam->GetString(L"strMemoryUser", 0);
-    newItem.strUserName = pParam->GetString(L"strUserName", 0);
-    newItem.dwParentPID = pParam->GetInt(L"dwParentPID", 0);
-    newItem.dwHandleCount = pParam->GetInt(L"dwHandleCount", 0);
-    newItem.dwThreadCount = pParam->GetInt(L"dwThreadCount", 0);
-    newItem.dwSessionID = pParam->GetInt(L"dwSessionID", 0);
-
-    DWORD dwProcessId = pParam->GetInt(L"dwProcessID", 0);
-
-    m_mapProInfo[dwProcessId] = newItem;
+    LoadDataFromIpc(pParam);
 
     return 0;
 }
 
 int KBkwinDemoDlg::FirstLoadEnd(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*)
 {
-    //UpdateCacheMapToRealMap();
     m_evtFirsetLoadEnd.SetEvent();
 
     return 0;
@@ -205,6 +191,33 @@ int KBkwinDemoDlg::FirstLoadEnd(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyI
 
 int KBkwinDemoDlg::RefreshProcess(easyipc::IEasyIpcBundle* pParam, easyipc::IEasyIpcBundle*)
 {
+    if(!m_bFirstLoad)
+        return 0;
+
+    int emType = pParam->GetInt(L"ProcessChangeType", 0);
+
+    switch(emType)
+    {
+    //case type_process_change:
+    case type_process_new:
+        {
+            SetProcessInfo newItem = LoadDataFromIpc(pParam);
+            AddListItem(newItem);
+        }
+        break;
+    case type_process_exit:
+        DWORD processId = pParam->GetInt(L"dwProcessID", 0);
+        OnProcessExit(processId);
+        CBkListWnd* pList = (CBkListWnd*)FindChildByCmdID(IDC_LIST_PROC);
+        if(pList)
+        {
+            CBkWindow* pItem = (CBkWindow*)pList->FindChildByCmdID(processId);
+            if(pItem)
+                pList->RemoveChildItem(pItem);
+        }
+        break;
+    }
+
     return 0;
 }
 
@@ -303,24 +316,7 @@ BOOL KBkwinDemoDlg::AddListItemChilds(SetProcessInfo & data, KCreateXmlElementFu
         XmlElFunc.AddTinySibling("text", IDC_LIST_KEY + i, CT2A(strPos), NULL, NULL, i > 1?"text_center":"text_left");
         XmlElFunc().Write("crtext", "999999");
         XmlElFunc().WriteText(vecData[i]);
-        /*if(!m_bRefreshHeader)
-        {
-            RefreshListHeader(tinyXml, nLeft, nRight, m_vecHeaderData[i]);
-        }*/
     }
-
-    /*if(!m_bRefreshHeader)
-    {
-        CStringA strXml = tinyXml.ToXml();
-        CBkPanel* pPanel = static_cast<CBkPanel*>(GetBkItem(IDC_DLG_HEADER));
-        if(pPanel != NULL)
-        {
-            pPanel->LoadChilds(tinyXml.GetElement());
-            SetItemNeedReDraw(IDC_DLG_HEADER);
-        }
-
-        m_bRefreshHeader = TRUE;
-    }*/
 
     return TRUE;
 }
@@ -423,6 +419,40 @@ void KBkwinDemoDlg::CreateListHeader()
     m_pTitleDlg->NotifyInvalidate();
 }
 
+SetProcessInfo KBkwinDemoDlg::LoadDataFromIpc(easyipc::IEasyIpcBundle* pParam)
+{
+    KLocker locker(m_csNewItemNotify);
+    SetProcessInfo newItem;
+
+    newItem.strProcessFullPath = pParam->GetString(L"strProcessFullPath", NULL);
+    newItem.strProcessName = pParam->GetString(L"strProcessName", NULL);
+    newItem.dwProcessID = pParam->GetInt(L"dwProcessID", 0);
+    newItem.dwCpuUsage = pParam->GetInt(L"dwCpuUsage", 0);
+    newItem.strMemoryUser = pParam->GetString(L"strMemoryUser", 0);
+    newItem.strUserName = pParam->GetString(L"strUserName", 0);
+    newItem.dwParentPID = pParam->GetInt(L"dwParentPID", 0);
+    newItem.dwHandleCount = pParam->GetInt(L"dwHandleCount", 0);
+    newItem.dwThreadCount = pParam->GetInt(L"dwThreadCount", 0);
+    newItem.dwSessionID = pParam->GetInt(L"dwSessionID", 0);
+
+    DWORD dwProcessId = pParam->GetInt(L"dwProcessID", 0);
+
+    m_mapProInfo[dwProcessId] = newItem;
+
+    return newItem;
+}
+
+void KBkwinDemoDlg::OnProcessExit(DWORD dwProcessId)
+{
+    KLocker locker(m_csNewItemNotify);
+
+    map<DWORD, SetProcessInfo>::iterator iter = m_mapProInfo.find(dwProcessId);
+    if(iter != m_mapProInfo.end())
+    {
+        m_mapProInfo.erase(iter);
+    }
+}
+
 void KBkwinDemoDlg::OnListItemLButtonUp( int nListItem )
 {
 
@@ -451,24 +481,24 @@ void KBkwinDemoDlg::UpdateWindowsUI()
 	{
 		return;
 	}
-	//DeleteAllListItem(IDC_LIST_PROC);
+	DeleteAllListItem(IDC_LIST_PROC);
 
 	
 	// AddTableTitleToListWnd();  	//  第一列的行头 添加
-    CreateListHeader();
+    
 
 	// TODO 第一列的行头在 这里添加
 	int nIndex = 0;
 	for (map<DWORD, SetProcessInfo>::iterator it= m_mapProInfo.begin();
 		it != m_mapProInfo.end(); ++it)
 	{
-		AddListItem(it->second, nIndex++);
+		AddListItem(it->second);
 	}
 
 	UpdateLayoutList(IDC_LIST_PROC);
 }
 
-BOOL KBkwinDemoDlg::AddListItem( SetProcessInfo & data , int nIndex)
+BOOL KBkwinDemoDlg::AddListItem( SetProcessInfo & data)
 {
 	BOOL bReturn = FALSE;
 	KTinyXml tinyXml;
@@ -483,7 +513,7 @@ BOOL KBkwinDemoDlg::AddListItem( SetProcessInfo & data , int nIndex)
 		}
 
 		KTinyXmlRememberPos(tinyXml);
-		bRetCode = CreateListItemXml(data, tinyXml, nIndex);
+		bRetCode = CreateListItemXml(data, tinyXml);
 
 		if (!bRetCode || !tinyXml.FirstChild())
 		{
@@ -501,12 +531,14 @@ Exit0:
 	return bReturn;
 }
 
-BOOL KBkwinDemoDlg::CreateListItemXml(SetProcessInfo & data, KTinyXml tinyXml, int nIndex )
+BOOL KBkwinDemoDlg::CreateListItemXml(SetProcessInfo & data, KTinyXml tinyXml)
 {
 	BOOL bReturn = FALSE;
 	KCreateXmlElementFunc XmlElFunc(tinyXml);
 
-	bReturn = XmlElFunc.AddTinyChild("listitem", 100 + nIndex, NULL, NULL, NULL, NULL, "1");
+
+    //int id = data.dwProcessID;
+	bReturn = XmlElFunc.AddTinyChild("listitem", data.dwProcessID, NULL, NULL, NULL, NULL, "1");
 	if (FALSE == bReturn) goto Exit0;
 
 
@@ -539,90 +571,6 @@ void KBkwinDemoDlg::UpdateConfig()
 	m_SelectSum = ConfigUtilInst.GetSelectSum();
 	//m_nItemWidth = ITEM_WIDTH * (ALL_ITEM_NUM / m_SelectSum); 
 }
-
-BOOL KBkwinDemoDlg::AddTableTitleToListWnd()
-{
-// 	BOOL bReturn = FALSE;
-// 	KTinyXml tinyXml;
-// 
-// 	do 
-// 	{
-// 		BOOL bRetCode = FALSE;
-// 
-// 		if (NULL == tinyXml.Open("Root", TRUE))
-// 		{
-// 			break;
-// 		}
-// 
-// 		if (TRUE)
-// 		{
-// 			KTinyXmlRememberPos(tinyXml);
-// 			bRetCode = CreateTitleListItemXml(data, tinyXml, nIndex);
-// 		}
-// 
-// 		if (!bRetCode || !tinyXml.FirstChild())
-// 		{
-// 			goto Exit0;
-// 		}
-// 		CStringA strXml = tinyXml.ToXml();
-// 		int nListItem = AppendListItem(IDC_LIST_PROC, tinyXml.GetElement(), -1, FALSE);
-// 		if (nListItem == -1) goto Exit0;
-// 
-// 		bReturn = TRUE;
-// 
-// 	}while(FALSE);
-// 
-// Exit0:
-// 	return bReturn;
-}
-
-// BOOL KBkwinDemoDlg::CreateTextItemXml(SetProcessInfo & data, KTinyXml tinyXml, unsigned int flag )
-// {
-// 	int nwidth = m_nItemWidth ; //可变, 根据选了多少个长度
-// 	CString pos;
-// 	int posFirstLeft;
-// 	int posFirstRight;
-// 	CString str;
-// 
-// 	BOOL bReturn = FALSE;
-// 	CStringA StrPos;
-// 	KCreateXmlElementFunc XmlElFunc(tinyXml);
-// 
-// 	bReturn = XmlElFunc.AddTinyChild("listitem", 0, NULL, NULL, NULL, NULL, "1");
-// 	if (FALSE == bReturn) goto Exit0;
-// 
-// 
-// 	bReturn = XmlElFunc().Write("height", ITEM_HEIGHT);
-// 	if (FALSE == bReturn) goto Exit0;
-// 
-// 	bReturn = XmlElFunc().Write("class", "listitem_class");
-// 	if (FALSE == bReturn) goto Exit0;
-// 
-// 	bReturn = XmlElFunc.AddTinyChild("dlg", NULL,  "0,0,-0,-0", NULL, NULL, NULL, "1");
-// 	if (FALSE == bReturn) goto Exit0;
-// 
-// 	posFirstLeft = 0;
-// 	posFirstRight = posFirstLeft + nwidth;
-// 	pos.AppendFormat(L"%d,0,%d,-0", posFirstLeft, posFirstRight);
-// 	bReturn = XmlElFunc.AddTinySibling("text", IDC_LIST_KEY, CT2A(pos), NULL, NULL, "text_center");
-// 	if (FALSE == bReturn) return bReturn;
-// 	XmlElFunc().Write("crtext", "999999");
-// 	XmlElFunc().WriteText(data.strProcessName);
-// 
-// 	pos.Empty();
-// 	posFirstLeft = posFirstRight;
-// 	posFirstRight = posFirstLeft + nwidth;
-// 	pos.AppendFormat(L"%d,0,%d,-0", posFirstLeft, posFirstRight);
-// 	bReturn = XmlElFunc.AddTinySibling("text", IDC_LIST_KEY, CT2A(pos), NULL, NULL, "text_center");
-// 	if (FALSE == bReturn) return bReturn;
-// 	XmlElFunc().Write("crtext", "999999");
-// 	str.Empty();
-// 	str.AppendFormat(L"%d", data.dwParentPID);
-// 	XmlElFunc().WriteText(str);
-// 
-// Exit0:
-// 	return bReturn;
-// }
 
 void KBkwinDemoDlg::OnActivate(KActor* pActor)
 {
