@@ -1,5 +1,5 @@
 ﻿<layer title="进程管理器" width="400" height="200" show="1">
-    <header crbg="5a9deb" width="full" height="50">
+    <header crbg="f1c800" width="full" height="50">
       <img pos="6,8" skin="logo"/>
       <text class="text_title" pos="25,10">进程管理器设置</text>
 	  <imgbtn id="200" pos="-40,0" skin="dlg_btn_close"/>
@@ -21,11 +21,11 @@
 
     <dlg pos="0,-30,-0,-0"  >
       <!--<text  id="40007" pos="15,10" crtext="649AF0" class="linkimage"  font="0002">恢复默认</text>-->
-      <dlgbtn id="201" crbg="5a9deb" pos="-120,3,-70,28" class="linkimage" >
+      <dlgbtn id="201" crbg="f1c800" pos="-120,3,-70,28" class="linkimage" >
         <text pos="12,0,-12,-0"  class="linkimage">确定</text>
       </dlgbtn>
 
-      <dlgbtn id="202"  crbg="5a9deb" pos="-65,3,-15,28" class="linkimage" >
+      <dlgbtn id="202"  crbg="f1c800" pos="-65,3,-15,28" class="linkimage" >
         <text pos="12,0,-12,-0" class="linkimage">取消</text>
       </dlgbtn>
 

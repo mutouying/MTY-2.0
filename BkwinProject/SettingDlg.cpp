@@ -59,11 +59,24 @@ void SettingDlg::ShowDoModalMsgBox(BkSharePtr<CString> msg)
 
 void SettingDlg::InitSeting()
 {
-	SetItemCheck(ID_CHECK_PRO_NAME , (m_flagSet & FlagProcessName)>0);
-	SetItemCheck(ID_CHECK_PRO_ID , (m_flagSet & FlagProcessPid)>0);
-	SetItemCheck(ID_CHECK_PRO_PATH , (m_flagSet & FlagProcessPath)>0);
-	SetItemCheck(ID_CHECK_PRO_CPU , (m_flagSet & FlagProcessCpu)>0);
-	SetItemCheck(ID_CHECK_PRO_MEM , (m_flagSet & FlagProcessMem)>0);
+// 	SetItemCheck(ID_CHECK_PRO_NAME , (m_flagSet & FlagProcessName)>0);
+// 	SetItemCheck(ID_CHECK_PRO_ID , (m_flagSet & FlagProcessPid)>0);
+// 	SetItemCheck(ID_CHECK_PRO_PATH , (m_flagSet & FlagProcessPath)>0);
+// 	SetItemCheck(ID_CHECK_PRO_CPU , (m_flagSet & FlagProcessCpu)>0);
+// 	SetItemCheck(ID_CHECK_PRO_MEM , (m_flagSet & FlagProcessMem)>0);
+
+	SetItemCheck(ID_CHECK_PRO_NAME ,TRUE);
+	SetItemCheck(ID_CHECK_PRO_ID , TRUE);
+	SetItemCheck(ID_CHECK_PRO_PATH , TRUE);
+	SetItemCheck(ID_CHECK_PRO_CPU , TRUE);
+	SetItemCheck(ID_CHECK_PRO_MEM , TRUE);
+
+	EnableItem(ID_CHECK_PRO_NAME,FALSE);
+	EnableItem(ID_CHECK_PRO_ID,FALSE);
+	EnableItem(ID_CHECK_PRO_PATH,FALSE);
+	EnableItem(ID_CHECK_PRO_CPU,FALSE);
+	EnableItem(ID_CHECK_PRO_MEM,FALSE);
+
 	SetItemCheck(ID_CHECK_PRO_EXT_1 , (m_flagSet & FlagProcessUser)>0);
 	SetItemCheck(ID_CHECK_PRO_EXT_2 , (m_flagSet & FlagProcessParent)>0);
 	SetItemCheck(ID_CHECK_PRO_EXT_3 , (m_flagSet & FlagProcessHandle)>0);
