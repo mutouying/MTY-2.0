@@ -69,6 +69,8 @@ protected:
 	void OnListItemMouseLeave(int nListItem);
 	void OnListItemChildLBtnUp(int nListItem, int nChildCtrlId);
 
+	void UpdateConfig();
+	BOOL AddTableTitleToListWnd();
 	void UpdateWindowsUI();
 	BOOL AddOnekeyToListWnd(SetProcessInfo& data , int nIndex);
 	BOOL CreateHotkeyListItemXml(SetProcessInfo & data, KTinyXml tinyXml, int nIndex );
@@ -91,7 +93,10 @@ private:
 	map<DWORD, SetProcessInfo> m_mapProInfo;
 	map<DWORD, SetProcessInfo> m_mapProCache;
 private:
-	RECT					m_oldRect;
+	// RECT	m_oldRect;
+	int		m_nItemWidth;
+	unsigned int   m_flagSet; 
+	int   m_SelectSum;
 
     KCriticalSesion  m_csNewItemNotify;
     CString m_strIpcName1;

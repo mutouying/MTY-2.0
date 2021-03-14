@@ -4,8 +4,10 @@
 
 #include "framework/KTinyXml.h"
 #include "framework/KCreateXmlElementFunc.h"
+#include "ConfigUtil.h"
 
 #define  ITEM_HEIGHT 20
+#define  ITEM_WIDTH  100
 
 KBkwinDemoDlg::KBkwinDemoDlg()
     : CBkDialogViewImplEx<KBkwinDemoDlg>(IDR_MAIN)
@@ -14,6 +16,9 @@ KBkwinDemoDlg::KBkwinDemoDlg()
     LoadMule();
     m_evtFirsetLoadEnd.Create(NULL, TRUE, FALSE);
 	m_pMenu = NULL;
+	m_nItemWidth = ITEM_WIDTH;
+	m_flagSet = 0;
+	m_SelectSum =0;
 }
 
 KBkwinDemoDlg::~KBkwinDemoDlg()
@@ -75,7 +80,7 @@ void KBkwinDemoDlg::OnBkMenuCmd(CBkDialogMenu* pDialogMenu, LPCWSTR lpszMenuName
 void KBkwinDemoDlg::OnBtnMin()
 {
 	SendMessage(WM_SYSCOMMAND, SC_MINIMIZE | HTCAPTION, 0);
-	GetWindowRect(&m_oldRect);
+	// GetWindowRect(&m_oldRect);
 }
 
 
@@ -180,12 +185,8 @@ void KBkwinDemoDlg::OnSetting()
 	
  	if(m_settingDlg.DoModal()==IDOK)
  	{
-		// 确定，有更改数据，更新画面
- 		
- 	}
- 	else
- 	{
- 		// 不需要变化
+		UpdateConfig();
+ 		UpdateWindowsUI();
  	}
 	return;
 }
@@ -193,7 +194,7 @@ void KBkwinDemoDlg::OnSetting()
 void KBkwinDemoDlg::testCode()
 {
 	m_mapProInfo.clear();
-	for(DWORD i = 0; i< 200; ++i)
+	for(DWORD i = 0; i< 400; ++i)
 	{
 		SetProcessInfo info(i);
 		m_mapProInfo.insert(make_pair(i, info));
@@ -237,6 +238,8 @@ void KBkwinDemoDlg::UpdateWindowsUI()
 	}
 	//DeleteAllListItem(IDC_LIST_PROC);
 
+	UpdateConfig();
+	// AddTableTitleToListWnd();  	//  第一列的行头 添加
 
 	// TODO 第一列的行头在 这里添加
 	//AddOnekeyToListWnd( SetProcessInfo() , 0);
@@ -269,11 +272,8 @@ BOOL KBkwinDemoDlg::AddOnekeyToListWnd( SetProcessInfo & data , int nIndex)
 			break;
 		}
 
-		if (TRUE)
-		{
-			KTinyXmlRememberPos(tinyXml);
-			bRetCode = CreateHotkeyListItemXml(data, tinyXml, nIndex);
-		}
+		KTinyXmlRememberPos(tinyXml);
+		bRetCode = CreateHotkeyListItemXml(data, tinyXml, nIndex);
 
 		if (!bRetCode || !tinyXml.FirstChild())
 		{
@@ -293,7 +293,7 @@ Exit0:
 
 BOOL KBkwinDemoDlg::CreateHotkeyListItemXml(SetProcessInfo & data, KTinyXml tinyXml, int nIndex )
 {
-	int nwidth = 100; //可变, 根据选了多少个长度
+	int nwidth = m_nItemWidth ; //可变, 根据选了多少个长度
 	CString pos;
 	int posFirstLeft;
 	int posFirstRight;
@@ -313,9 +313,6 @@ BOOL KBkwinDemoDlg::CreateHotkeyListItemXml(SetProcessInfo & data, KTinyXml tiny
 	bReturn = XmlElFunc().Write("class", "listitem_class");
 	if (FALSE == bReturn) goto Exit0;
 
-	bReturn = XmlElFunc.AddTinyChild("dlg", NULL,  "0,0,-0,-0", NULL, NULL, NULL, "1");
-	if (FALSE == bReturn) goto Exit0;
- 
 	posFirstLeft = 0;
 	posFirstRight = posFirstLeft + nwidth;
 	pos.AppendFormat(L"%d,0,%d,-0", posFirstLeft, posFirstRight);
@@ -346,3 +343,95 @@ void KBkwinDemoDlg::OnListItemChildLBtnUp(int nListItem, int nChildCtrlId)
 // 	strMsg.DataRef().Format(L"DemoListWndDlg::OnListItemChildLBtnUp:%d %d", nListItem, nChildCtrlId);
 // 	PostRunnable(BkWin::FuncFactory::create_class_func(this, &DemoListWndDlg::ShowDoModalMsgBox, strMsg));
 }
+
+void KBkwinDemoDlg::UpdateConfig()
+{
+	m_flagSet = ConfigUtilInst.GetFlagSet();
+	m_SelectSum = ConfigUtilInst.GetSelectSum();
+	m_nItemWidth = ITEM_WIDTH * (ALL_ITEM_NUM / m_SelectSum); 
+}
+
+BOOL KBkwinDemoDlg::AddTableTitleToListWnd()
+{
+// 	BOOL bReturn = FALSE;
+// 	KTinyXml tinyXml;
+// 
+// 	do 
+// 	{
+// 		BOOL bRetCode = FALSE;
+// 
+// 		if (NULL == tinyXml.Open("Root", TRUE))
+// 		{
+// 			break;
+// 		}
+// 
+// 		if (TRUE)
+// 		{
+// 			KTinyXmlRememberPos(tinyXml);
+// 			bRetCode = CreateTitleListItemXml(data, tinyXml, nIndex);
+// 		}
+// 
+// 		if (!bRetCode || !tinyXml.FirstChild())
+// 		{
+// 			goto Exit0;
+// 		}
+// 		CStringA strXml = tinyXml.ToXml();
+// 		int nListItem = AppendListItem(IDC_LIST_PROC, tinyXml.GetElement(), -1, FALSE);
+// 		if (nListItem == -1) goto Exit0;
+// 
+// 		bReturn = TRUE;
+// 
+// 	}while(FALSE);
+// 
+// Exit0:
+// 	return bReturn;
+}
+
+// BOOL KBkwinDemoDlg::CreateTextItemXml(SetProcessInfo & data, KTinyXml tinyXml, unsigned int flag )
+// {
+// 	int nwidth = m_nItemWidth ; //可变, 根据选了多少个长度
+// 	CString pos;
+// 	int posFirstLeft;
+// 	int posFirstRight;
+// 	CString str;
+// 
+// 	BOOL bReturn = FALSE;
+// 	CStringA StrPos;
+// 	KCreateXmlElementFunc XmlElFunc(tinyXml);
+// 
+// 	bReturn = XmlElFunc.AddTinyChild("listitem", 0, NULL, NULL, NULL, NULL, "1");
+// 	if (FALSE == bReturn) goto Exit0;
+// 
+// 
+// 	bReturn = XmlElFunc().Write("height", ITEM_HEIGHT);
+// 	if (FALSE == bReturn) goto Exit0;
+// 
+// 	bReturn = XmlElFunc().Write("class", "listitem_class");
+// 	if (FALSE == bReturn) goto Exit0;
+// 
+// 	bReturn = XmlElFunc.AddTinyChild("dlg", NULL,  "0,0,-0,-0", NULL, NULL, NULL, "1");
+// 	if (FALSE == bReturn) goto Exit0;
+// 
+// 	posFirstLeft = 0;
+// 	posFirstRight = posFirstLeft + nwidth;
+// 	pos.AppendFormat(L"%d,0,%d,-0", posFirstLeft, posFirstRight);
+// 	bReturn = XmlElFunc.AddTinySibling("text", IDC_LIST_KEY, CT2A(pos), NULL, NULL, "text_center");
+// 	if (FALSE == bReturn) return bReturn;
+// 	XmlElFunc().Write("crtext", "999999");
+// 	XmlElFunc().WriteText(data.strProcessName);
+// 
+// 	pos.Empty();
+// 	posFirstLeft = posFirstRight;
+// 	posFirstRight = posFirstLeft + nwidth;
+// 	pos.AppendFormat(L"%d,0,%d,-0", posFirstLeft, posFirstRight);
+// 	bReturn = XmlElFunc.AddTinySibling("text", IDC_LIST_KEY, CT2A(pos), NULL, NULL, "text_center");
+// 	if (FALSE == bReturn) return bReturn;
+// 	XmlElFunc().Write("crtext", "999999");
+// 	str.Empty();
+// 	str.AppendFormat(L"%d", data.dwParentPID);
+// 	XmlElFunc().WriteText(str);
+// 
+// Exit0:
+// 	return bReturn;
+// }
+

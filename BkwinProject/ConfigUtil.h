@@ -1,5 +1,7 @@
 #pragma once
 
+#define ALL_ITEM_NUM     10
+
 // flag 设置界面的flag
 #define FlagProcessName					0x00000001	
 #define FlagProcessPid					0x00000002
@@ -15,6 +17,7 @@
 
 #define  KEY_FLAG_SET L"key_flag_set"
 #define  KEY_SELECT_SUM L"key_select_sum"
+
 
 class ConfigUtil
 {
@@ -67,3 +70,28 @@ private:
 };
 
 #define ConfigUtilInst  ConfigUtil::GetInstace()
+
+
+//  以下结构体，全部使用Cstring，为了展示方便
+typedef struct tagSetProcessInfoCstring
+{
+	DWORD ProcessID;
+	CString strProcessName;   //进程名称
+	CString strProcessFullPath;   //进程全路径
+	CString dwProcessID;  //进程ID
+	CString dwCpuUser;   //CPU占用
+	CString dwMemoryUser;   //内存占用
+
+	CString strUserName;// 用户名
+	CString dwParentPID;	//父进程PID
+	CString dwHandleCount;	// 句柄数
+	CString dwThreadCount;	// 线程数
+	CString dwSessionID;	//会话ID
+
+	tagSetProcessInfoCstring(DWORD dwPid)
+	{	
+		ProcessID = dwPid;
+		strProcessName = L"strProcessName";
+	}
+
+}SetProcessInfoString, *pSetProcessInfoString;

@@ -47,6 +47,7 @@ Debug
 *.VC.db
 *.aps
 *.ipch
+*.pdb
 
 Microsoft SDKs
-publish
+bin
